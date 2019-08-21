@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.62
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LodAutoBot", "LodAutoBot\LodAutoBot.csproj", "{08EE1F1F-6D33-455A-9D56-C62E01EDBFEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08EE1F1F-6D33-455A-9D56-C62E01EDBFEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08EE1F1F-6D33-455A-9D56-C62E01EDBFEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08EE1F1F-6D33-455A-9D56-C62E01EDBFEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08EE1F1F-6D33-455A-9D56-C62E01EDBFEF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C9EA2FF-6DE9-4BF4-949E-E13B62807FEE}
+	EndGlobalSection
+EndGlobal

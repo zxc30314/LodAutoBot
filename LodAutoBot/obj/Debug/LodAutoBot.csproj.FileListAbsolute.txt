@@ -1,0 +1,9 @@
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.csprojAssemblyReference.cache
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.Properties.Resources.resources
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.csproj.GenerateResource.cache
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.csproj.CoreCompileInputs.cache
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.exe.config
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.exe
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.pdb
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.exe
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.pdb
