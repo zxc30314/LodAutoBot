@@ -29,21 +29,21 @@ public partial class Form1 : Form
 
     class ImageData
     {
-     
+
         public string[] Paths;
         public Range[] range;
         public Color TextColor;
-        public ImageData( string[] s, Range[] r)
+        public ImageData(string[] s, Range[] r)
         {
-           
+
             Paths = s;
             range = r;
-        
+
         }
-      
+
         public ImageData()
         {
-          
+
             Paths = new string[0];
             range = new Range[0];
             TextColor = Color.Black;
@@ -62,22 +62,21 @@ public partial class Form1 : Form
     static string windowsStateImagePath = Path.Combine(ImagePath, "Windows");
     static string monsterImagePath = Path.Combine(ImagePath, "Monster");
     static string underGroundImagePath = Path.Combine(ImagePath, "UnderGround");
-
-
-    //  ImageData[] windowsData = new ImageData[Enum.GetNames(typeof(State)).Length];
-    //ImageData[] clickData = new ImageData[Enum.GetNames(typeof(ClickImage)).Length];
-    //ImageData[] monsterData = new ImageData[Enum.GetNames(typeof(Level)).Length];
-    //ImageData[]underGroundData= new ImageData[Enum.GetNames(typeof(Level)).Length];
+    static string intimacyImagePath = Path.Combine(ImagePath, "Intimacy");
 
     Dictionary<string, ImageData> windowsData = new Dictionary<string, ImageData>();
     Dictionary<string, ImageData> clickData = new Dictionary<string, ImageData>();
     Dictionary<string, ImageData> monsterData = new Dictionary<string, ImageData>();
     Dictionary<string, ImageData> underGroundData = new Dictionary<string, ImageData>();
+    Dictionary<string, ImageData> intimacyData = new Dictionary<string, ImageData>();
 
     CheckBox[] checkBoxes_Monster = new CheckBox[Enum.GetNames(typeof(Level)).Length];
     CheckBox[] checkBoxes_UnderGround = new CheckBox[Enum.GetNames(typeof(Level)).Length];
     Color[] color_Level = new Color[] { HexToColor("#7c7c7c"), HexToColor("#8cc067"), HexToColor("#4274c6"), HexToColor("#9463c7"), HexToColor("#d8733c"), HexToColor("#ba3230"), HexToColor("#ffe71b"), HexToColor("#ff00dd") };
     private delegate void UpdateState(string text);
+
+    static int intimacyInt;
+
     private void WriteState(string text)
     {
         if (label1.InvokeRequired)
@@ -94,7 +93,7 @@ public partial class Form1 : Form
 
     static Color HexToColor(string hex)
     {
-        string color = hex; //This would be a parameter
+        string color = hex;
         if (color.StartsWith("#"))
             color = color.Remove(0, 1);
         byte r, g, b;
@@ -124,6 +123,13 @@ public partial class Form1 : Form
         AddCheckBoxes(groupBox_Monster, checkBoxes_Monster);
 
         AddCheckBoxes(groupBox_UnderGround, checkBoxes_UnderGround);
+        trackBar_Intimacy.ValueChanged += new System.EventHandler(this.SetIntimacy);
+    }
+
+    void SetIntimacy(object sender, EventArgs e)
+    {
+        intimacyInt = trackBar_Intimacy.Value;
+        label_Intimacy.Text = ((Intimacy)trackBar_Intimacy.Value).ToString();
     }
 
     void AddCheckBoxes(GroupBox groupBox, CheckBox[] checkBoxes)
@@ -169,7 +175,7 @@ public partial class Form1 : Form
 
         Process[] localByName = Process.GetProcessesByName("Nox");
 
-        // hwnd = dm.FindWindowEx(0, "Qt5QWindowIcon", TitleNameBox.Text);
+
         if (TitleNameBox.Text == "")
         {
 
@@ -218,11 +224,11 @@ public partial class Form1 : Form
         {
             process = localByName[id];
             titleName = localByName[id].MainWindowTitle;
-            //  SetWindowText(localByName[id].MainWindowHandle, "綁定中_" + localByName[id].MainWindowTitle);
+
             label1.Text = "窗口綁定成功";
             TitleNameBox.Text = titleName;
             label1.Update();
-            // dm.GetClientSize(hwnd, out processWidth, out processHeight);
+
         }
 
 
@@ -259,6 +265,8 @@ public partial class Form1 : Form
     public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 遠征, 開始遠征, 地下城資訊, 前往地下城 }
 
     public enum Level { 普通, 高級, 稀有, 古代, 傳說, 不滅, 神話, 幻想 }
+
+    public enum Intimacy { 非常警戒, 警戒, 熟悉, 親近, 信賴 }
     void ChangeState(State mstate)
     {
         this.state = mstate;
@@ -291,12 +299,13 @@ public partial class Form1 : Form
         ChichExists(clickImagePath, typeof(ClickImage));
         ChichExists(monsterImagePath, typeof(Level));
         ChichExists(underGroundImagePath, typeof(Level));
-
+        ChichExists(intimacyImagePath, typeof(Intimacy));
 
         SetImageData(windowsStateImagePath, typeof(State), ref windowsData);
         SetImageData(clickImagePath, typeof(ClickImage), ref clickData);
         SetImageData(monsterImagePath, typeof(Level), ref monsterData);
         SetImageData(underGroundImagePath, typeof(Level), ref underGroundData);
+        SetImageData(intimacyImagePath, typeof(Intimacy), ref intimacyData);
     }
     void ChichExists(string imagePath, Type typef)
     {
@@ -342,7 +351,7 @@ public partial class Form1 : Form
 
             var tempRange = file.Select((x) => new Range(x.Name.Split('.')[0].Split(',').Select((s, i) => int.TryParse(s, out i) ? i : -1).ToArray()));
             Range[] iii = new Range[1];
-            return (true, new ImageData( tempImagePath.ToArray(), tempRange.ToArray()));
+            return (true, new ImageData(tempImagePath.ToArray(), tempRange.ToArray()));
 
         }
 
@@ -353,28 +362,6 @@ public partial class Form1 : Form
 
     }
 
-    //void SetImageData(string path, Type childPath, ref ImageData[] data)
-    //{
-    //    bool b;
-    //    ImageData image;
-
-    //    for (int i = 0; i < data.Length; i++)
-    //    {
-
-    //        (b, image) = ReImageData(path, Enum.GetName(childPath, i));
-
-    //        if (b)
-    //        {
-    //            data[i] = image;
-    //        }
-    //        else
-    //        {
-    //            data[i] = new ImageData(Enum.GetName(childPath, i));
-    //        }
-
-    //    }
-
-    //}
     void SetImageData(string path, Type childPath, ref Dictionary<string, ImageData> dic)
     {
         bool b;
@@ -389,10 +376,10 @@ public partial class Form1 : Form
             {
                 dic.Add(Enum.GetName(childPath, i), image);
             }
-            //else
-            //{
-            //    data[i] = new ImageData(Enum.GetName(childPath, i));
-            //}
+            else
+            {
+                dic.Add(Enum.GetName(childPath, i), new ImageData());
+            }
 
         }
 
@@ -460,7 +447,7 @@ public partial class Form1 : Form
             {
                 case State.未知:
 
-                    //MessageBox.Show(FindAllPictureAndClick(windowsData, State.未知).ToString());
+
                     RestWindows(windowsData);
                     Thread.Sleep(100);
 
@@ -497,7 +484,7 @@ public partial class Form1 : Form
 
                     while (true)
                     {
-
+                        Thread.Sleep(1000);
                         if (!FindAllPicture(windowsData, State.地區))
                         {
                             ChangeState(State.未知);
@@ -561,28 +548,40 @@ public partial class Form1 : Form
 
                     Thread.Sleep(100);
 
-                    if (捕捉.Checked)
+                    if (!捕捉.Checked)
                     {
-                        for (int i = 0; i < Enum.GetNames(typeof(Level)).Length; i++)
+                        FindAllPictureAndClick(clickData, ClickImage.問候);//問候
+                       
+                        break;
+                    }
+                    bool isFind = false;
+                    for (int i = 0; i < Enum.GetNames(typeof(Level)).Length; i++)
+                    {
+                        if (checkBoxes_Monster[i].Checked && FindAllPicture(monsterData, (Level)i))
                         {
-                            if (checkBoxes_Monster[i].Checked)
+
+                            for (int j =intimacyInt; j < Enum.GetNames(typeof(Intimacy)).Length; j++)
                             {
-                                if (FindAllPicture(monsterData, (Level)i))
+                              
+                                if (FindAllPicture(intimacyData, (Intimacy)j))
                                 {
-                                    FindAllPictureAndClick(clickData, ClickImage.嘗試捕捉);//捕捉
+                                    isFind = true;
+                                   
+                                      FindAllPictureAndClick(clickData, ClickImage.嘗試捕捉);//捕捉
+                                    break;
                                 }
                             }
 
-
-
+                           
                         }
-                        FindAllPictureAndClick(clickData, ClickImage.問候);//問候
-                    }
-                    else
-                    {
-                        FindAllPictureAndClick(clickData, ClickImage.問候);//問候
+                     
                     }
 
+                    if (!isFind) {
+                      
+                        FindAllPictureAndClick(clickData, ClickImage.問候);//問候
+
+                    }
 
 
                     //Thread.Sleep(100);
@@ -727,12 +726,11 @@ public partial class Form1 : Form
     void RestWindows(Dictionary<string, ImageData> datas)
     {
 
-        for (int i = 0; i < windowsData.Count; i++)
+        for (int i = 1; i < datas.Count; i++)
         {
-            for (int j = 0; j < windowsData.ElementAt(i).Value.Paths.Length; j++)
+            for (int j = 0; j < datas.ElementAt(i).Value.Paths.Length; j++)
             {
-
-                if (FindPicture(windowsData.ElementAt(i).Value.Paths[j], 0.7, windowsData.ElementAt(i).Value.range[j]).Item1 != -1)
+                if (FindPicture(datas.ElementAt(i).Value.Paths[j], 0.7, datas.ElementAt(i).Value.range[j]).Item1 != -1)
                 {
                     ChangeState((State)i);
                 }
@@ -758,23 +756,16 @@ public partial class Form1 : Form
                 if (FindPicture(imageData.Paths[j], 0.7, imageData.range[j]).Item1 != -1)
                 {
                     isFindImage = true;
-                    break;
+
                 }
             }
         }
-
-
-
-
-
         return isFindImage;
     }
     bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data)
     {
         bool isFindImage = false;
 
-
-        // (isFindData, imageData) = FindImageData(imageDatas, data);
         if (imageDatas.ContainsKey(data.ToString()))
         {
             ImageData imageData = imageDatas[data.ToString()];
@@ -786,14 +777,10 @@ public partial class Form1 : Form
                 {
                     isFindImage = true;
                     break;
+
                 }
             }
         }
-
-
-
-
-
         return isFindImage;
     }
 

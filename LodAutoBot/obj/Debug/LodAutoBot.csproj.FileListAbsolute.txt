@@ -7,3 +7,4 @@ C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.exe
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.pdb
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.exe
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.pdb
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\Form1.resources
