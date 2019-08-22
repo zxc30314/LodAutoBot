@@ -72,7 +72,9 @@ public partial class Form1 : Form
 
     CheckBox[] checkBoxes_Monster = new CheckBox[Enum.GetNames(typeof(Level)).Length];
     CheckBox[] checkBoxes_UnderGround = new CheckBox[Enum.GetNames(typeof(Level)).Length];
-    Color[] color_Level = new Color[] { HexToColor("#7c7c7c"), HexToColor("#8cc067"), HexToColor("#4274c6"), HexToColor("#9463c7"), HexToColor("#d8733c"), HexToColor("#ba3230"), HexToColor("#ffe71b"), HexToColor("#ff00dd") };
+    Color[] color_TextLevel = new Color[] { HexToColor("#7c7c7c"), HexToColor("#8cc067"), HexToColor("#4274c6"), HexToColor("#9463c7"), HexToColor("#d8733c"), HexToColor("#ba3230"), HexToColor("#ffe71b"), HexToColor("#ff00dd") };
+    Color[] color_UnderGroundMonsterLevel = new Color[] { HexToColor("#323232"), HexToColor("#2F5648"), HexToColor("#624730"), HexToColor("#563243"), HexToColor("#34558B"), HexToColor("#202263") };
+
     private delegate void UpdateState(string text);
 
     static int intimacyInt;
@@ -144,7 +146,7 @@ public partial class Form1 : Form
             checkBoxes[i].Top = top;
             checkBoxes[i].Left = left;
             checkBoxes[i].Text = ((Level)i).ToString();
-            checkBoxes[i].ForeColor = color_Level[i];
+            checkBoxes[i].ForeColor = color_TextLevel[i];
             groupBox.Controls.Add(checkBoxes[i]);
 
             top += checkBoxes[i].Height + 2;
@@ -260,9 +262,9 @@ public partial class Form1 : Form
     }
 
 
-    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 };
+    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面,封鎖地下城,地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 };
 
-    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 遠征, 開始遠征, 地下城資訊, 前往地下城 }
+    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認,立即封鎖,強制封鎖, 遠征, 開始遠征, 地下城資訊, 前往地下城 ,地下城封鎖完畢}
 
     public enum Level { 普通, 高級, 稀有, 古代, 傳說, 不滅, 神話, 幻想 }
 
@@ -364,6 +366,7 @@ public partial class Form1 : Form
 
     void SetImageData(string path, Type childPath, ref Dictionary<string, ImageData> dic)
     {
+        dic.Clear();
         bool b;
         ImageData image;
 
@@ -551,7 +554,7 @@ public partial class Form1 : Form
                     if (!捕捉.Checked)
                     {
                         FindAllPictureAndClick(clickData, ClickImage.問候);//問候
-                       
+
                         break;
                     }
                     bool isFind = false;
@@ -560,25 +563,26 @@ public partial class Form1 : Form
                         if (checkBoxes_Monster[i].Checked && FindAllPicture(monsterData, (Level)i))
                         {
 
-                            for (int j =intimacyInt; j < Enum.GetNames(typeof(Intimacy)).Length; j++)
+                            for (int j = intimacyInt; j < Enum.GetNames(typeof(Intimacy)).Length; j++)
                             {
-                              
+
                                 if (FindAllPicture(intimacyData, (Intimacy)j))
                                 {
                                     isFind = true;
-                                   
-                                      FindAllPictureAndClick(clickData, ClickImage.嘗試捕捉);//捕捉
+
+                                    FindAllPictureAndClick(clickData, ClickImage.嘗試捕捉);//捕捉
                                     break;
                                 }
                             }
 
-                           
+
                         }
-                     
+
                     }
 
-                    if (!isFind) {
-                      
+                    if (!isFind)
+                    {
+
                         FindAllPictureAndClick(clickData, ClickImage.問候);//問候
 
                     }
@@ -654,7 +658,7 @@ public partial class Form1 : Form
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    FindAllPictureAndClick(clickData, ClickImage.立即封鎖);
                     break;
                 case State.桌面:
                     if (!FindAllPictureAndClick(windowsData, State.桌面))
@@ -698,6 +702,26 @@ public partial class Form1 : Form
                         ChangeState(State.未知);
                         break;
                     }
+                    break;
+                case State.封鎖地下城:
+                    if (!FindAllPicture(windowsData, State.封鎖地下城))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+                    FindAllPictureAndClick(clickData, ClickImage.強制封鎖);
+
+
+                    break;
+                case State.地下城封鎖完畢:
+                    if (!FindAllPictureAndClick(windowsData, State.地下城封鎖完畢))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+     
                     break;
                 default:
                     break;
@@ -896,6 +920,13 @@ public partial class Form1 : Form
 
 
     void BattleSkip()
+    {
+
+    }
+
+  
+
+    private void Form1_Load_1(object sender, EventArgs e)
     {
 
     }
