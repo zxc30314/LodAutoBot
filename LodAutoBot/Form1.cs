@@ -12,15 +12,17 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using testdm;
+using System.Numerics;
 
 public partial class Form1 : Form
 {
-
-
+  
 
 
     public Form1()
     {
+
+
         InitializeComponent();
         Start();
 
@@ -126,6 +128,7 @@ public partial class Form1 : Form
 
         AddCheckBoxes(groupBox_UnderGround, checkBoxes_UnderGround);
         trackBar_Intimacy.ValueChanged += new System.EventHandler(this.SetIntimacy);
+        SetButton();
     }
 
     void SetIntimacy(object sender, EventArgs e)
@@ -156,7 +159,7 @@ public partial class Form1 : Form
     }
 
     CDmSoft dm;
-    int hwnd;
+    IntPtr hwnd;
     public State state;
     public bool isBind;
 
@@ -172,79 +175,44 @@ public partial class Form1 : Form
 
     void bindButton_Click(object sender, EventArgs e)
     {
-        dm = new CDmSoft();
-        int id = -1;
-
-        Process[] localByName = Process.GetProcessesByName("Nox");
-
-
-        if (TitleNameBox.Text == "")
-        {
-
-
-            for (int i = 0; i < localByName.Length; i++)
-            {
-                if (localByName[i].ProcessName.Split('_')[0] != "綁定中")
-                {
-                    id = i;
-                    break;
-
-                }
-
-            }
-        }
-        else
-        {
-            for (int i = 0; i < localByName.Length; i++)
-            {
-                if (localByName[i].ProcessName.Split('_')[0] != "綁定中" && localByName[i].MainWindowTitle == TitleNameBox.Text)
-                {
-                    id = i;
-                    break;
-                }
-
-            }
-
-
-        }
-
-        if (id == -1)
-        {
-            isBind = false;
-            label1.Text = "查找句柄失敗";
-            label1.Update();
-            return;
-        }
-
-        hwnd = (int)localByName[id].MainWindowHandle;
-        isBind = hwnd != 0 && id != -1;
-        SetButton();
-        int setBind;
-        setBind = dm.BindWindow(hwnd, "gdi", "windows3", "windows", 1);
-
-        if (setBind == 1)
-        {
-            process = localByName[id];
-            titleName = localByName[id].MainWindowTitle;
-
-            label1.Text = "窗口綁定成功";
-            TitleNameBox.Text = titleName;
-            label1.Update();
-
-        }
-
-
+      
 
 
 
     }
+
+    void BindWindow() {
+
+        dm = new CDmSoft();
+      
+
+     
+         process=Process.GetProcessById(CurWindow.ProcessId);
+
+    
+      
+
+        hwnd = process.MainWindowHandle;
+        
+       
+        int setBind;
+        setBind = dm.BindWindow((int)hwnd, "gdi", "windows3", "windows", 1);
+        label1.Text = "窗口綁定成功";
+        TitleNameBox.Text = process.MainWindowTitle;
+        label1.Update();
+      
+        isBind = setBind==1;
+
+        SetButton();
+    }
     void SetButton()
     {
-        bindButton.Enabled = !isBind;
+        
         rebindButton.Enabled = isBind;
         TitleNameBox.Enabled = !isBind;
         buttonStartFind.Enabled = isBind && !isRun;
         buttonStopFind.Enabled = isBind && isRun;
+        pictureBox1.Enabled = !isBind;
 
     }
 
@@ -252,22 +220,24 @@ public partial class Form1 : Form
     {
         if (process != null)
         {
+           
             StopFind();
-            SetWindowText(process.MainWindowHandle, titleName);
-            isBind = false;
-            SetButton();
+            isBind = !(dm.UnBindWindow() == 1);
+            process = null;
             dm = null;
+            SetButton();
+         
             label1.Text = "解除綁定";
         }
     }
 
 
-    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面,封鎖地下城,地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 };
+    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 ,收益報告};
 
-    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認,立即封鎖,強制封鎖, 遠征, 開始遠征, 地下城資訊, 前往地下城 ,地下城封鎖完畢}
+    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢,村收 }
 
     public enum Level { 普通, 高級, 稀有, 古代, 傳說, 不滅, 神話, 幻想 }
-
+    public enum UnderGroundLevel { 普通, 高級, 稀有, 古代, 傳說20000,傳說30000,傳說40000, 不滅, 神話 }
     public enum Intimacy { 非常警戒, 警戒, 熟悉, 親近, 信賴 }
     void ChangeState(State mstate)
     {
@@ -428,15 +398,12 @@ public partial class Form1 : Form
         }
         dm.LeftUp();
 
-
-
-
-
-
     }
     void MainThread()
     {
-
+        bool isFind = false;
+        bool isFindEnd = false;
+        bool expeditionNotFind = false;
         ChangeState(State.未知);
         while (true)
         {
@@ -444,7 +411,7 @@ public partial class Form1 : Form
             Thread.Sleep(500);
 
 
-
+            //  MessageBox.Show(isFind.ToString() + " " + AllFindEnd.ToString());
 
             switch (state)
             {
@@ -461,18 +428,29 @@ public partial class Form1 : Form
                         ChangeState(State.未知);
                         break;
                     }
-                    Thread.Sleep(100);
-                    if (遠征.Checked)
+                    Thread.Sleep(500);
+
+                    if (FindAllPictureAndClick(clickData, ClickImage.村收))
                     {
-                        FindAllPictureAndClick(clickData, ClickImage.遠征);
+                        break;
                     }
+                    else {
 
-                    else
-                    {
+                        Thread.Sleep(500);
+                        if (!FindAllPicture(clickData, ClickImage.探索報告_小) && 遠征.Checked)
+                        {
 
-                        FindAllPictureAndClick(clickData, ClickImage.地圖);
+                            FindAllPictureAndClick(clickData, ClickImage.遠征);
+                        }
 
+                        else if (FindAllPicture(clickData, ClickImage.探索報告_小))
+                        {
+
+                            FindAllPictureAndClick(clickData, ClickImage.地圖);
+
+                        }
                     }
+                  
 
 
 
@@ -481,54 +459,72 @@ public partial class Form1 : Form
                 case State.地區:
 
 
-
+                    isFind = isFindEnd = false;
 
                     //拖動
 
-                    while (true)
+                    //MessageBox.Show(isFind.ToString());
+                    Thread.Sleep(100);
+                    if (!FindAllPicture(windowsData, State.地區))
                     {
-                        Thread.Sleep(1000);
-                        if (!FindAllPicture(windowsData, State.地區))
-                        {
-                            ChangeState(State.未知);
-                            break;
-                        }
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+                    FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
+                    Thread.Sleep(100);
 
-                        if (FindAllPictureAndClick(clickData, ClickImage.探索完畢_白))
+                    if (!FindAllPictureAndClick(clickData, ClickImage.探索完畢_白) && !FindAllPicture(clickData, ClickImage.探索完畢_藍))
+                    {
+
+                        int[] x = new int[] { 10, -1, 0, 1, 0 };
+                        int[] y = new int[] { 10, 0, -1, -0, 1 };
+                        int[] count = new int[] { 1, 4, 2, 4, 2 };
+                        for (int i = 0; i < x.Length; i++)
                         {
-                            Thread.Sleep(1000);
-                            if (FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍))
+
+                            if (!isFind)
                             {
+                                DoMouseDropLoop(x[i], y[i], count[i]);
+                            }
+                            else
+                            {
+                                FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
+                            }
+                            Thread.Sleep(100);
+                            if (!FindAllPicture(windowsData, State.地區))
+                            {
+                                ChangeState(State.未知);
                                 break;
                             }
+                            Thread.Sleep(1000);
+
+                            //   MessageBox.Show(isFindEnd.ToString());
                         }
-                        else
+                        FindAllPictureAndClick(clickData, ClickImage.關閉);
+
+                    }
+                    Thread.Sleep(500);
+
+
+
+
+
+
+                    void DoMouseDropLoop(int tx, int ty, int tcount)
+                    {
+                        for (int i = 0; i < tcount; i++)
                         {
-                            int[] x = new int[] { 5, -1, 0, 1, 0 };
-                            int[] y = new int[] { 5, 0, -1, 0, 1 };
-
-                            for (int i = 0; i < 5; i++)
+                            if (FindAllPictureAndClick(clickData, ClickImage.探索完畢_白))
                             {
-                                if (!FindAllPictureAndClick(clickData, ClickImage.探索完畢_白))
-                                {
-
-                                    MouseDrop(x[i], y[i], 50);
-                                    Thread.Sleep(1000);
-
-                                }
-                                else
-                                {
-
-                                    break;
-                                }
+                                isFind = true;
+                                break;
                             }
-
-
-
+                            Thread.Sleep(100);
+                            MouseDrop(tx, ty, 30);
+                            Thread.Sleep(200);
                         }
                     }
-
-
 
                     break;
                 case State.探索完畢:
@@ -557,7 +553,7 @@ public partial class Form1 : Form
 
                         break;
                     }
-                    bool isFind = false;
+                    isFind = false;
                     for (int i = 0; i < Enum.GetNames(typeof(Level)).Length; i++)
                     {
                         if (checkBoxes_Monster[i].Checked && FindAllPicture(monsterData, (Level)i))
@@ -674,6 +670,8 @@ public partial class Form1 : Form
                         ChangeState(State.未知);
                         break;
                     }
+
+                    expeditionNotFind = false;
                     Thread.Sleep(100);
                     FindAllPictureAndClick(clickData, ClickImage.開始遠征);
                     break;
@@ -685,23 +683,56 @@ public partial class Form1 : Form
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.地下城資訊);
+                    if (expeditionNotFind)
+                    {
+                        FindAllPictureAndClick(clickData, ClickImage.探索其他領地);
+                        expeditionNotFind = false;
+                    }
+                    else
+                    {
+                        FindAllPictureAndClick(clickData, ClickImage.地下城資訊);
+                    }
+
                     break;
                 case State.地下城目錄:
+
                     if (!FindAllPicture(windowsData, State.地下城目錄))
                     {
                         ChangeState(State.未知);
                         break;
                     }
+                    //127,259,195,806  Level
 
+                    //407,256,635,876
+                    for (int i = Enum.GetNames(typeof(Level)).Length - 1; i >= 0; i--)
+                    {
+
+                        if (checkBoxes_UnderGround[i].Checked && FindAllPictureAndClick(underGroundData, (Level)i, new Range(127, 259, 635, 876)))
+                        {
+                            expeditionNotFind = false;
+                            Thread.Sleep(100);
+                            FindAllPictureAndClick(clickData, ClickImage.前往地下城);
+                            break;
+                        }
+                        else
+                        {
+                            expeditionNotFind = true;
+                        }
+                    }
+                    if (expeditionNotFind)
+                    {
+                        FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    }
 
                     break;
                 case State.地下城發現獎勵:
-                    if (!FindAllPicture(clickData, State.地下城發現獎勵))
+                    if (!FindAllPictureAndClick(windowsData, State.地下城發現獎勵))
                     {
                         ChangeState(State.未知);
                         break;
                     }
+                    expeditionNotFind = isFind = false;
+
                     break;
                 case State.封鎖地下城:
                     if (!FindAllPicture(windowsData, State.封鎖地下城))
@@ -721,7 +752,17 @@ public partial class Form1 : Form
                         break;
                     }
                     Thread.Sleep(100);
-     
+
+                    break;
+                case State.收益報告:
+                    if (!FindAllPictureAndClick(windowsData, State.收益報告))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+                    FindAllPictureAndClick(clickData, ClickImage.確認);
+
                     break;
                 default:
                     break;
@@ -807,7 +848,27 @@ public partial class Form1 : Form
         }
         return isFindImage;
     }
+    bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, Range range)
+    {
+        bool isFindImage = false;
 
+        if (imageDatas.ContainsKey(data.ToString()))
+        {
+            ImageData imageData = imageDatas[data.ToString()];
+
+            for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
+            {
+
+                if (FindPictureAndClick(imageData.Paths[j], 0.7, range) != -1)
+                {
+                    isFindImage = true;
+                    break;
+
+                }
+            }
+        }
+        return isFindImage;
+    }
 
     //開始找探險完畢
     void StartFind()
@@ -835,7 +896,7 @@ public partial class Form1 : Form
 
         }
         isRun = false;
-        dm.UnBindWindow();
+     
         SetButton();
         mainThread.Abort();
     }
@@ -885,7 +946,7 @@ public partial class Form1 : Form
         {
             x1 = 0;
             y1 = 0;
-            dm.GetClientSize(hwnd, out x2, out y2);
+            dm.GetClientSize((int)hwnd, out x2, out y2);
         }
         else
         {
@@ -924,11 +985,131 @@ public partial class Form1 : Form
 
     }
 
-  
+
 
     private void Form1_Load_1(object sender, EventArgs e)
     {
 
+    }
+
+    private void PictureBox1_Click(object sender, EventArgs e)
+    {
+
+    }
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    public const int WM_GETTEXT = 0xD;
+    public const int WM_GETTEXTLENGTH = 0x000E;
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr WindowFromPoint(Point point);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int GetClassName(IntPtr handle, StringBuilder ClassName, int MaxCount);
+
+    [DllImport("user32.dll")]
+    public static extern int SendMessage(IntPtr handle, int msg, int Param1, int Param2);
+
+    [DllImport("user32.dll")]
+    public static extern int SendMessage(IntPtr handle, int msg, int Param, System.Text.StringBuilder text);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetWindowRect(IntPtr handle, out RECT Rect);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+    public class WindowInfo
+    {
+        public int ProcessId;
+        public IntPtr Handle;
+        public string ClassName;
+        public string Text;
+        public Rectangle Rect;
+
+        public WindowInfo(IntPtr Handle)
+        {
+            this.Handle = Handle;
+            this.ClassName = GetWindowClassName(Handle);
+            this.Text = GetWindowText(Handle);
+            this.Rect = GetWindowRectangle(Handle);
+            GetWindowThreadProcessId(Handle, out ProcessId);
+        }
+    }
+
+    WindowInfo LastWindow = null;
+    WindowInfo CurWindow;
+
+  
+    private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        {
+            Point pt = Cursor.Position;
+           // this.Text = "Mouse Position: " + pt.ToString();
+            this.CurWindow = new WindowInfo(WindowFromPoint(pt));
+
+            //label1.Text = "Handle: " + this.CurWindow.Handle.ToString("X");
+            //label2.Text = "Class: " + this.CurWindow.ClassName;
+            //label3.Text = "Text: " + this.CurWindow.Text;
+            //label4.Text = "Rectangle: " + this.CurWindow.Rect.ToString();
+            //label5.Text = CurWindow.ProcessId.ToString();
+            if (this.LastWindow == null)
+            {
+                ControlPaint.DrawReversibleFrame(this.CurWindow.Rect, Color.Black, FrameStyle.Thick);
+            }
+            else if (!this.CurWindow.Handle.Equals(this.LastWindow.Handle))
+            {
+                ControlPaint.DrawReversibleFrame(this.LastWindow.Rect, Color.Black, FrameStyle.Thick);
+                ControlPaint.DrawReversibleFrame(this.CurWindow.Rect, Color.Black, FrameStyle.Thick);
+            }
+
+            this.LastWindow = this.CurWindow;
+        }
+    }
+
+    private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        {
+            if (this.LastWindow != null)
+            {
+               // ControlPaint.DrawReversibleFrame(this.LastWindow.Rect, Color.Black, FrameStyle.Thick);
+
+                // ... do something with "this.LastWindow" ...
+                BindWindow();
+            }
+        }
+    }
+
+    public static string GetWindowClassName(IntPtr handle)
+    {
+        StringBuilder buffer = new StringBuilder(128);
+        GetClassName(handle, buffer, buffer.Capacity);
+        return buffer.ToString();
+    }
+
+    public static string GetWindowText(IntPtr handle)
+    {
+        StringBuilder buffer = new StringBuilder(SendMessage(handle, WM_GETTEXTLENGTH, 0, 0) + 1);
+        SendMessage(handle, WM_GETTEXT, buffer.Capacity, buffer);
+        return buffer.ToString();
+    }
+
+    public static Rectangle GetWindowRectangle(IntPtr handle)
+    {
+        RECT rect = new RECT();
+        GetWindowRect(handle, out rect);
+        return new Rectangle(rect.Left, rect.Top, (rect.Right - rect.Left) + 1, (rect.Bottom - rect.Top) + 1);
     }
 }
 

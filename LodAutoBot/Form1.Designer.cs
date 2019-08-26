@@ -1,35 +1,35 @@
 ﻿
-    partial class Form1
+partial class Form1
+{
+
+    // static string[] windowsStateImage = new string[] { "地圖", "地區", "探索完畢","發現怪物", "選擇同伴", "結算介面", "捕捉怪物機會", "製造所" ,"發現地下城"};
+
+    /// <summary>
+    /// 必需的设计器变量。
+    /// </summary>
+    private System.ComponentModel.IContainer components = null;
+
+    /// <summary>
+    /// 清理所有正在使用的资源。
+    /// </summary>
+    /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
+    protected override void Dispose(bool disposing)
     {
-      
-       // static string[] windowsStateImage = new string[] { "地圖", "地區", "探索完畢","發現怪物", "選擇同伴", "結算介面", "捕捉怪物機會", "製造所" ,"發現地下城"};
-       
-        /// <summary>
-        /// 必需的设计器变量。
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
-
-        /// <summary>
-        /// 清理所有正在使用的资源。
-        /// </summary>
-        /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
-        protected override void Dispose(bool disposing)
+        if (disposing && (components != null))
         {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
+            components.Dispose();
         }
+        base.Dispose(disposing);
+    }
 
-        #region Windows 窗体设计器生成的代码
+    #region Windows 窗体设计器生成的代码
 
-        /// <summary>
-        /// 设计器支持所需的方法 - 不要
-        /// 使用代码编辑器修改此方法的内容。
-        /// </summary>
-        private void InitializeComponent()
-        {
+    /// <summary>
+    /// 设计器支持所需的方法 - 不要
+    /// 使用代码编辑器修改此方法的内容。
+    /// </summary>
+    private void InitializeComponent()
+    {
             this.buttonLoadSetting = new System.Windows.Forms.Button();
             this.buttonSaveSetting = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -37,27 +37,28 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox_UnderGround = new System.Windows.Forms.GroupBox();
             this.groupBox_Monster = new System.Windows.Forms.GroupBox();
+            this.trackBar_Intimacy = new System.Windows.Forms.TrackBar();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.遠征 = new System.Windows.Forms.CheckBox();
             this.捕捉 = new System.Windows.Forms.CheckBox();
             this.buttonStopFind = new System.Windows.Forms.Button();
             this.buttonStartFind = new System.Windows.Forms.Button();
             this.rebindButton = new System.Windows.Forms.Button();
             this.TitleNameBox = new System.Windows.Forms.TextBox();
-            this.bindButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.trackBar_Intimacy = new System.Windows.Forms.TrackBar();
             this.tabPage2.SuspendLayout();
             this.groupBox_Monster.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_Intimacy)).BeginInit();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.tabControl1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonLoadSetting
             // 
             this.buttonLoadSetting.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.buttonLoadSetting.Location = new System.Drawing.Point(424, 434);
+            this.buttonLoadSetting.Location = new System.Drawing.Point(432, 380);
             this.buttonLoadSetting.Name = "buttonLoadSetting";
             this.buttonLoadSetting.Size = new System.Drawing.Size(75, 23);
             this.buttonLoadSetting.TabIndex = 2;
@@ -68,7 +69,7 @@
             // buttonSaveSetting
             // 
             this.buttonSaveSetting.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.buttonSaveSetting.Location = new System.Drawing.Point(300, 434);
+            this.buttonSaveSetting.Location = new System.Drawing.Point(298, 380);
             this.buttonSaveSetting.Name = "buttonSaveSetting";
             this.buttonSaveSetting.Size = new System.Drawing.Size(75, 23);
             this.buttonSaveSetting.TabIndex = 3;
@@ -133,15 +134,26 @@
             this.groupBox_Monster.TabStop = false;
             this.groupBox_Monster.Text = "捕捉怪物";
             // 
+            // trackBar_Intimacy
+            // 
+            this.trackBar_Intimacy.LargeChange = 1;
+            this.trackBar_Intimacy.Location = new System.Drawing.Point(32, 255);
+            this.trackBar_Intimacy.Maximum = 4;
+            this.trackBar_Intimacy.Name = "trackBar_Intimacy";
+            this.trackBar_Intimacy.Size = new System.Drawing.Size(104, 45);
+            this.trackBar_Intimacy.TabIndex = 11;
+            // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.buttonLoadSetting);
+            this.tabPage1.Controls.Add(this.pictureBox1);
+            this.tabPage1.Controls.Add(this.buttonSaveSetting);
             this.tabPage1.Controls.Add(this.遠征);
             this.tabPage1.Controls.Add(this.捕捉);
             this.tabPage1.Controls.Add(this.buttonStopFind);
             this.tabPage1.Controls.Add(this.buttonStartFind);
             this.tabPage1.Controls.Add(this.rebindButton);
             this.tabPage1.Controls.Add(this.TitleNameBox);
-            this.tabPage1.Controls.Add(this.bindButton);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -149,6 +161,18 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "句柄";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.pictureBox1.Location = new System.Drawing.Point(9, 6);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(50, 50);
+            this.pictureBox1.TabIndex = 10;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.PictureBox1_Click);
+            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
+            this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
             // 
             // 遠征
             // 
@@ -192,7 +216,7 @@
             // 
             // rebindButton
             // 
-            this.rebindButton.Location = new System.Drawing.Point(105, 24);
+            this.rebindButton.Location = new System.Drawing.Point(80, 34);
             this.rebindButton.Name = "rebindButton";
             this.rebindButton.Size = new System.Drawing.Size(75, 23);
             this.rebindButton.TabIndex = 5;
@@ -202,20 +226,10 @@
             // 
             // TitleNameBox
             // 
-            this.TitleNameBox.Location = new System.Drawing.Point(80, 61);
+            this.TitleNameBox.Location = new System.Drawing.Point(80, 6);
             this.TitleNameBox.Name = "TitleNameBox";
             this.TitleNameBox.Size = new System.Drawing.Size(100, 22);
             this.TitleNameBox.TabIndex = 3;
-            // 
-            // bindButton
-            // 
-            this.bindButton.Location = new System.Drawing.Point(9, 24);
-            this.bindButton.Name = "bindButton";
-            this.bindButton.Size = new System.Drawing.Size(75, 23);
-            this.bindButton.TabIndex = 0;
-            this.bindButton.Text = "綁定窗口";
-            this.bindButton.UseVisualStyleBackColor = true;
-            this.bindButton.Click += new System.EventHandler(this.bindButton_Click);
             // 
             // tabControl1
             // 
@@ -230,22 +244,11 @@
             this.tabControl1.Size = new System.Drawing.Size(524, 435);
             this.tabControl1.TabIndex = 0;
             // 
-            // trackBar_Intimacy
-            // 
-            this.trackBar_Intimacy.LargeChange = 1;
-            this.trackBar_Intimacy.Location = new System.Drawing.Point(32, 255);
-            this.trackBar_Intimacy.Maximum = 4;
-            this.trackBar_Intimacy.Name = "trackBar_Intimacy";
-            this.trackBar_Intimacy.Size = new System.Drawing.Size(104, 45);
-            this.trackBar_Intimacy.TabIndex = 11;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(522, 493);
-            this.Controls.Add(this.buttonLoadSetting);
-            this.Controls.Add(this.buttonSaveSetting);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tabControl1);
             this.MaximizeBox = false;
@@ -256,33 +259,34 @@
             this.tabPage2.ResumeLayout(false);
             this.groupBox_Monster.ResumeLayout(false);
             this.groupBox_Monster.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Intimacy)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabControl1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Intimacy)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
-        }
+    }
 
-        #endregion
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button buttonLoadSetting;
-        private System.Windows.Forms.Button buttonSaveSetting;
-        private System.Windows.Forms.Label label_Intimacy;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.GroupBox groupBox_UnderGround;
-        private System.Windows.Forms.GroupBox groupBox_Monster;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.CheckBox 遠征;
-        private System.Windows.Forms.CheckBox 捕捉;
-        private System.Windows.Forms.Button buttonStopFind;
-        private System.Windows.Forms.Button buttonStartFind;
-        private System.Windows.Forms.Button rebindButton;
-        private System.Windows.Forms.TextBox TitleNameBox;
-        private System.Windows.Forms.Button bindButton;
-        private System.Windows.Forms.TabControl tabControl1;
+    #endregion
+    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Button buttonLoadSetting;
+    private System.Windows.Forms.Button buttonSaveSetting;
+    private System.Windows.Forms.Label label_Intimacy;
+    private System.Windows.Forms.TabPage tabPage2;
+    private System.Windows.Forms.GroupBox groupBox_UnderGround;
+    private System.Windows.Forms.GroupBox groupBox_Monster;
+    private System.Windows.Forms.TabPage tabPage1;
+    private System.Windows.Forms.CheckBox 遠征;
+    private System.Windows.Forms.CheckBox 捕捉;
+    private System.Windows.Forms.Button buttonStopFind;
+    private System.Windows.Forms.Button buttonStartFind;
+    private System.Windows.Forms.Button rebindButton;
+    private System.Windows.Forms.TextBox TitleNameBox;
+    private System.Windows.Forms.TabControl tabControl1;
     private System.Windows.Forms.TrackBar trackBar_Intimacy;
+    private System.Windows.Forms.PictureBox pictureBox1;
 }
 
 
