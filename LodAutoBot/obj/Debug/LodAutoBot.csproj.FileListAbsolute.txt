@@ -8,5 +8,4 @@ C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.pdb
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.exe
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.pdb
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\Form1.resources
-C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\bin\Debug\dm.dll
-C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\bin\Debug\dmc.dll
+C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\op_x86.dll

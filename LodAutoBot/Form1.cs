@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using testdm;
 using System.Numerics;
-
+using op_x64Net;
 public partial class Form1 : Form
 {
   
@@ -22,7 +22,7 @@ public partial class Form1 : Form
     public Form1()
     {
 
-
+     
         InitializeComponent();
         Start();
 
@@ -51,7 +51,7 @@ public partial class Form1 : Form
             TextColor = Color.Black;
         }
     }
-
+  
 
     Process process;
     string titleName;
@@ -158,7 +158,7 @@ public partial class Form1 : Form
 
     }
 
-    CDmSoft dm;
+    OpInterface op;
     IntPtr hwnd;
     public State state;
     public bool isBind;
@@ -183,7 +183,7 @@ public partial class Form1 : Form
 
     void BindWindow() {
 
-        dm = new CDmSoft();
+        op = new OpInterface();
       
 
      
@@ -193,10 +193,10 @@ public partial class Form1 : Form
       
 
         hwnd = process.MainWindowHandle;
-        
-       
+
+        MessageBox.Show(op.Ver());
         int setBind;
-        setBind = dm.BindWindow((int)hwnd, "gdi", "windows3", "windows", 1);
+        setBind = op.BindWindow((int)hwnd, "opengl", "windows", "windows", 1);
         label1.Text = "窗口綁定成功";
         TitleNameBox.Text = process.MainWindowTitle;
         label1.Update();
@@ -222,9 +222,9 @@ public partial class Form1 : Form
         {
            
             StopFind();
-            isBind = !(dm.UnBindWindow() == 1);
+            isBind = !(op.UnBindWindow() == 1);
             process = null;
-            dm = null;
+            op = null;
             SetButton();
          
             label1.Text = "解除綁定";
@@ -368,7 +368,7 @@ public partial class Form1 : Form
     {
         if (process != null)
         {
-            SetWindowText(process.MainWindowHandle, titleName);
+        
 
         }
         StopFind();
@@ -389,14 +389,14 @@ public partial class Form1 : Form
 
     void MouseDrop(int x, int y, int count)
     {
-        dm.MoveTo(800, 450);
-        dm.LeftDown();
+        op.MoveTo(800, 450);
+        op.LeftDown();
         for (int i = 0; i < count; i++)
         {
-            dm.MoveR(i * x, i * y);
+            op.MoveR(i * x, i * y);
             Thread.Sleep(20);
         }
-        dm.LeftUp();
+        op.LeftUp();
 
     }
     void MainThread()
@@ -946,7 +946,7 @@ public partial class Form1 : Form
         {
             x1 = 0;
             y1 = 0;
-            dm.GetClientSize((int)hwnd, out x2, out y2);
+            op.GetClientSize((int)hwnd, out x2, out y2);
         }
         else
         {
@@ -956,7 +956,7 @@ public partial class Form1 : Form
             y2 = rectangle.y2;
         }
 
-        int res = dm.FindPic((int)x1 - 5, (int)y1 - 5, (int)x2 + 5, (int)y2 + 5, picturePath, "000000", sim, 0, out fx, out fy);
+        int res = op.FindPic((int)x1 - 5, (int)y1 - 5, (int)x2 + 5, (int)y2 + 5, picturePath, "000000", sim, 0, out fx, out fy);
 
         return (res, (int)fx, (int)fy);
     }
@@ -967,8 +967,8 @@ public partial class Form1 : Form
 
         if (res >= 0)
         {
-            dm.MoveTo(intX, intY);
-            dm.LeftClick();
+            op.MoveTo(intX, intY);
+            op.LeftClick();
         }
         return res;
     }
