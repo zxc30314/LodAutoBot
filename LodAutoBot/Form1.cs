@@ -196,8 +196,14 @@ public partial class Form1 : Form
         
        
         int setBind;
-        setBind = dm.BindWindow((int)hwnd, "gdi", "windows3", "windows", 1);
-        label1.Text = "窗口綁定成功";
+        setBind = dm.BindWindow((int)hwnd, "dx2", "windows3", "windows", 1);
+        if (setBind == 1)
+        {
+            label1.Text = "窗口綁定成功";
+        }
+        else {
+            label1.Text = "窗口綁定失敗";
+        }
         TitleNameBox.Text = process.MainWindowTitle;
         label1.Update();
       
