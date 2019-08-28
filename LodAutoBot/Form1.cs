@@ -14,16 +14,15 @@ using System.Runtime.InteropServices;
 using testdm;
 using System.Numerics;
 using op_x64Net;
-
 public partial class Form1 : Form
 {
-
+  
 
 
     public Form1()
     {
 
-
+     
         InitializeComponent();
         Start();
 
@@ -52,7 +51,7 @@ public partial class Form1 : Form
             TextColor = Color.Black;
         }
     }
-
+  
 
     Process process;
     string titleName;
@@ -176,42 +175,39 @@ public partial class Form1 : Form
 
     void bindButton_Click(object sender, EventArgs e)
     {
-
+      
 
 
 
     }
 
-    void BindWindow()
-    {
+    void BindWindow() {
 
         op = new OpInterface();
+      
 
+     
+         process=Process.GetProcessById(CurWindow.ProcessId);
 
-
-        process = Process.GetProcessById(CurWindow.ProcessId);
-
-
-
+    
+      
 
         hwnd = process.MainWindowHandle;
 
-        //MessageBox.Show(op.Ver());
+        MessageBox.Show(op.Ver());
         int setBind;
-       setBind = op.BindWindow((int)hwnd, "gdi", "windows", "windows", 0);
+        setBind = op.BindWindow((int)hwnd, "opengl", "windows", "windows", 1);
         label1.Text = "窗口綁定成功";
         TitleNameBox.Text = process.MainWindowTitle;
         label1.Update();
-        if (setBind != 1) {
-            MessageBox.Show("f");
-        }
-       isBind = setBind == 1;
+      
+        isBind = setBind==1;
 
         SetButton();
     }
     void SetButton()
     {
-
+        
         rebindButton.Enabled = isBind;
         TitleNameBox.Enabled = !isBind;
         buttonStartFind.Enabled = isBind && !isRun;
@@ -224,24 +220,24 @@ public partial class Form1 : Form
     {
         if (process != null)
         {
-
+           
             StopFind();
             isBind = !(op.UnBindWindow() == 1);
             process = null;
             op = null;
             SetButton();
-
+         
             label1.Text = "解除綁定";
         }
     }
 
 
-    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵, 收益報告 };
+    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 ,收益報告};
 
-    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢, 村收 }
+    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢,村收 }
 
     public enum Level { 普通, 高級, 稀有, 古代, 傳說, 不滅, 神話, 幻想 }
-    public enum UnderGroundLevel { 普通, 高級, 稀有, 古代, 傳說20000, 傳說30000, 傳說40000, 不滅, 神話 }
+    public enum UnderGroundLevel { 普通, 高級, 稀有, 古代, 傳說20000,傳說30000,傳說40000, 不滅, 神話 }
     public enum Intimacy { 非常警戒, 警戒, 熟悉, 親近, 信賴 }
     void ChangeState(State mstate)
     {
@@ -372,7 +368,7 @@ public partial class Form1 : Form
     {
         if (process != null)
         {
-
+        
 
         }
         StopFind();
@@ -438,8 +434,7 @@ public partial class Form1 : Form
                     {
                         break;
                     }
-                    else
-                    {
+                    else {
 
                         Thread.Sleep(500);
                         if (!FindAllPicture(clickData, ClickImage.探索報告_小) && 遠征.Checked)
@@ -455,7 +450,7 @@ public partial class Form1 : Form
 
                         }
                     }
-
+                  
 
 
 
@@ -796,7 +791,7 @@ public partial class Form1 : Form
     void RestWindows(Dictionary<string, ImageData> datas)
     {
 
-        for (int i = 0; i < datas.Count; i++)
+        for (int i = 1; i < datas.Count; i++)
         {
             for (int j = 0; j < datas.ElementAt(i).Value.Paths.Length; j++)
             {
@@ -901,7 +896,7 @@ public partial class Form1 : Form
 
         }
         isRun = false;
-
+     
         SetButton();
         mainThread.Abort();
     }
@@ -960,45 +955,10 @@ public partial class Form1 : Form
             x2 = rectangle.x2;
             y2 = rectangle.y2;
         }
-       // MessageBox.Show(picturePath);
-    
 
-        
+        int res = op.FindPic((int)x1 - 5, (int)y1 - 5, (int)x2 + 5, (int)y2 + 5, picturePath, "000000", sim, 0, out fx, out fy);
 
-
-  
-
-        return FindPic(new Range((int)x1-5, (int)y1 -5, (int)x2 +5, (int)y2 +5), picturePath,sim);
-    }
-
-    (int, int, int) FindPic(Range range, string path, double sim)
-    {
-        int x1 = 0;
-        int y1 = 0;
-        int x2 = 0;
-        int y2 = 0;
-        object fx, fy;
-
-     
-        object width = 0;
-        object height = 0;
-      
-        op.GetClientSize((int)hwnd, out width, out height);
-
-        x2 = Clamp(range.x2, range.x2, (int)width);
-        y2 = Clamp(range.y2, range.y2, (int)height);
-
-        x1 = Clamp(range.x1, 0, x2);
-        y1 = Clamp(range.y1, 0, y2);
-      
-        int res = op.FindPic(x1, y1, x2, y2, path, "000000", sim, 0, out fx, out fy);
-      
         return (res, (int)fx, (int)fy);
-    }
-
-    public static int Clamp(int value, int min, int max)
-    {
-        return (value < min) ? min : (value > max) ? max : value;
     }
 
     int FindPictureAndClick(string picturePath, double sim, Range rectangle = null)
@@ -1089,13 +1049,13 @@ public partial class Form1 : Form
     WindowInfo LastWindow = null;
     WindowInfo CurWindow;
 
-
+  
     private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
     {
         if (e.Button == System.Windows.Forms.MouseButtons.Left)
         {
             Point pt = Cursor.Position;
-            // this.Text = "Mouse Position: " + pt.ToString();
+           // this.Text = "Mouse Position: " + pt.ToString();
             this.CurWindow = new WindowInfo(WindowFromPoint(pt));
 
             //label1.Text = "Handle: " + this.CurWindow.Handle.ToString("X");
@@ -1117,24 +1077,13 @@ public partial class Form1 : Form
         }
     }
 
-    private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-    {
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
-        {
-            if (this.LastWindow != null)
-            {
-                op.UnBindWindow();
-            }
-        }
-    }
-
     private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
     {
         if (e.Button == System.Windows.Forms.MouseButtons.Left)
         {
             if (this.LastWindow != null)
             {
-                // ControlPaint.DrawReversibleFrame(this.LastWindow.Rect, Color.Black, FrameStyle.Thick);
+               // ControlPaint.DrawReversibleFrame(this.LastWindow.Rect, Color.Black, FrameStyle.Thick);
 
                 // ... do something with "this.LastWindow" ...
                 BindWindow();
@@ -1161,25 +1110,6 @@ public partial class Form1 : Form
         RECT rect = new RECT();
         GetWindowRect(handle, out rect);
         return new Rectangle(rect.Left, rect.Top, (rect.Right - rect.Left) + 1, (rect.Bottom - rect.Top) + 1);
-    }
-
-    private void Button1_Click(object sender, EventArgs e)
-    {
-        int x1 = 0;
-        int y1 = 0;
-        object x2 = 0;
-        object y2 = 0;
-        object fx, fy;
-     //  int iii = int.Parse(TitleNameBox.Text);
-      //  op = new OpInterface();
-
-     
-      
-        op.Capture(0, 0, 2000, 2000, "screen.bmp");
-        op.UnBindWindow();
-
-      
-
     }
 }
 

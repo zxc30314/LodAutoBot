@@ -47,7 +47,6 @@ partial class Form1
             this.rebindButton = new System.Windows.Forms.Button();
             this.TitleNameBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.button1 = new System.Windows.Forms.Button();
             this.tabPage2.SuspendLayout();
             this.groupBox_Monster.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_Intimacy)).BeginInit();
@@ -146,7 +145,6 @@ partial class Form1
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.buttonLoadSetting);
             this.tabPage1.Controls.Add(this.pictureBox1);
             this.tabPage1.Controls.Add(this.buttonSaveSetting);
@@ -175,11 +173,10 @@ partial class Form1
             this.pictureBox1.Click += new System.EventHandler(this.PictureBox1_Click);
             this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
             this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
-        this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
-        // 
-        // 遠征
-        // 
-        this.遠征.AutoSize = true;
+            // 
+            // 遠征
+            // 
+            this.遠征.AutoSize = true;
             this.遠征.Location = new System.Drawing.Point(9, 163);
             this.遠征.Name = "遠征";
             this.遠征.Size = new System.Drawing.Size(48, 16);
@@ -247,16 +244,6 @@ partial class Form1
             this.tabControl1.Size = new System.Drawing.Size(524, 435);
             this.tabControl1.TabIndex = 0;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(384, 163);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -300,7 +287,6 @@ partial class Form1
     private System.Windows.Forms.TabControl tabControl1;
     private System.Windows.Forms.TrackBar trackBar_Intimacy;
     private System.Windows.Forms.PictureBox pictureBox1;
-    private System.Windows.Forms.Button button1;
 }
 
 
