@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using testdm;
 using System.Numerics;
-using op_x64Net;
+using op_x86Net;
 public partial class Form1 : Form
 {
   
@@ -158,7 +158,7 @@ public partial class Form1 : Form
 
     }
 
-    OpInterface op;
+    MainRobot robot;
     IntPtr hwnd;
     public State state;
     public bool isBind;
@@ -183,7 +183,7 @@ public partial class Form1 : Form
 
     void BindWindow() {
 
-        op = new OpInterface();
+        robot = new MainRobot();
       
 
      
@@ -194,14 +194,14 @@ public partial class Form1 : Form
 
         hwnd = process.MainWindowHandle;
 
-        MessageBox.Show(op.Ver());
-        int setBind;
-        setBind = op.BindWindow((int)hwnd, "opengl", "windows", "windows", 1);
+       // MessageBox.Show(robot.Ver());
+        bool setBind;
+        setBind = robot.BindWindow(hwnd, "opengl", "windows", "windows", 1);
         label1.Text = "窗口綁定成功";
         TitleNameBox.Text = process.MainWindowTitle;
         label1.Update();
       
-        isBind = setBind==1;
+        isBind = setBind;
 
         SetButton();
     }
@@ -222,9 +222,9 @@ public partial class Form1 : Form
         {
            
             StopFind();
-            isBind = !(op.UnBindWindow() == 1);
+            isBind = !(robot.UnBindWindow());
             process = null;
-            op = null;
+            robot = null;
             SetButton();
          
             label1.Text = "解除綁定";
@@ -389,14 +389,14 @@ public partial class Form1 : Form
 
     void MouseDrop(int x, int y, int count)
     {
-        op.MoveTo(800, 450);
-        op.LeftDown();
+        robot.MoveTo(800, 450);
+        robot.LeftDown();
         for (int i = 0; i < count; i++)
         {
-            op.MoveR(i * x, i * y);
+            robot.MoveR(i * x, i * y);
             Thread.Sleep(20);
         }
-        op.LeftUp();
+        robot.LeftUp();
 
     }
     void MainThread()
@@ -795,7 +795,7 @@ public partial class Form1 : Form
         {
             for (int j = 0; j < datas.ElementAt(i).Value.Paths.Length; j++)
             {
-                if (FindPicture(datas.ElementAt(i).Value.Paths[j], 0.7, datas.ElementAt(i).Value.range[j]).Item1 != -1)
+                if (FindPicture(datas.ElementAt(i).Value.Paths[j], 0.7, datas.ElementAt(i).Value.range[j].GetRectangle()).Item1 )
                 {
                     ChangeState((State)i);
                 }
@@ -818,7 +818,7 @@ public partial class Form1 : Form
             for (int j = 0; j < imageData.Paths.Length; j++)
             {
 
-                if (FindPicture(imageData.Paths[j], 0.7, imageData.range[j]).Item1 != -1)
+                if (FindPicture(imageData.Paths[j], 0.7, imageData.range[j].GetRectangle()).Item1 )
                 {
                     isFindImage = true;
 
@@ -838,7 +838,7 @@ public partial class Form1 : Form
             for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
             {
 
-                if (FindPictureAndClick(imageData.Paths[j], 0.7, imageData.range[j]) != -1)
+                if (FindPictureAndClick(imageData.Paths[j], 0.9, imageData.range[j].GetRectangle()) )
                 {
                     isFindImage = true;
                     break;
@@ -859,7 +859,7 @@ public partial class Form1 : Form
             for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
             {
 
-                if (FindPictureAndClick(imageData.Paths[j], 0.7, range) != -1)
+                if (FindPictureAndClick(imageData.Paths[j], 0.9, range.GetRectangle()) )
                 {
                     isFindImage = true;
                     break;
@@ -904,12 +904,17 @@ public partial class Form1 : Form
     class Range
     {
         public int x1, y1, x2, y2;
+        Rectangle rectangle;
+        public Rectangle GetRectangle() {
+            return rectangle;
+        }
         public Range(int x1, int y1, int x2, int y2)
         {
             this.x1 = x1;
             this.y1 = y1;
             this.x2 = x2;
             this.y2 = y2;
+            rectangle = new Rectangle(x1, y1, x2, y2);
         }
         public Range(int[] i)
         {
@@ -924,51 +929,30 @@ public partial class Form1 : Form
             {
                 x1 = 0;
                 y1 = 0;
-                x2 = 2000;
-                y2 = 2000;
+                x2 = 0;
+                y2 = 0;
             }
-
+            rectangle = new Rectangle(x1, y1, x2, y2);
         }
 
     }
 
 
 
-    (int, int, int) FindPicture(string picturePath, double sim, Range rectangle = null)
+    (bool, int, int) FindPicture(string picturePath, double sim, Rectangle rectangle)
     {
 
-        object x1 = 0;
-        object y1 = 0;
-        object x2 = 0;
-        object y2 = 0;
-        object fx, fy;
-        if (rectangle == null)
-        {
-            x1 = 0;
-            y1 = 0;
-            op.GetClientSize((int)hwnd, out x2, out y2);
-        }
-        else
-        {
-            x1 = rectangle.x1;
-            y1 = rectangle.y1;
-            x2 = rectangle.x2;
-            y2 = rectangle.y2;
-        }
-
-        int res = op.FindPic((int)x1 - 5, (int)y1 - 5, (int)x2 + 5, (int)y2 + 5, picturePath, "000000", sim, 0, out fx, out fy);
-
-        return (res, (int)fx, (int)fy);
+        return robot.FindPic(rectangle, picturePath, "000000", sim, 0); 
     }
 
-    int FindPictureAndClick(string picturePath, double sim, Range rectangle = null)
+    bool FindPictureAndClick(string picturePath, double sim, Rectangle rectangle)
     {
-        (int res, int intX, int intY) = FindPicture(picturePath, sim, rectangle);
+        (bool res, int intX, int intY) = FindPicture(picturePath, sim, rectangle);
 
-        if (res >= 0)
+        if (res)
         {
-            op.MoveTo(intX, intY);
-            op.LeftClick();
+            robot.MoveTo(intX, intY);
+            robot.LeftClick();
         }
         return res;
     }
@@ -999,7 +983,7 @@ public partial class Form1 : Form
 
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
+    public struct Rect
     {
         public int Left;
         public int Top;
@@ -1024,7 +1008,7 @@ public partial class Form1 : Form
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetWindowRect(IntPtr handle, out RECT Rect);
+    public static extern bool GetWindowRect(IntPtr handle, out Rect Rect);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
@@ -1107,7 +1091,7 @@ public partial class Form1 : Form
 
     public static Rectangle GetWindowRectangle(IntPtr handle)
     {
-        RECT rect = new RECT();
+        Rect rect = new Rect();
         GetWindowRect(handle, out rect);
         return new Rectangle(rect.Left, rect.Top, (rect.Right - rect.Left) + 1, (rect.Bottom - rect.Top) + 1);
     }
