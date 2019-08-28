@@ -6,10 +6,11 @@ using System.Windows.Forms;
 using op_x86Net;
 public class MainRobot
 {
-    // OpInterface op;
+     OpInterface op;
     public MainRobot()
     {
-       // op = new OpInterface();
+       op = new OpInterface();
+      
     }
     IntPtr hwnd;
 
@@ -139,45 +140,31 @@ public class MainRobot
     */
     #endregion
 
-    [DllImport("op_x86.dll")]
-    private static extern int iBindWindow(int hwnd, string display, string mouse, string keypad, int mode);
-    [DllImport("op_x86.dll")]
-    private static extern int IUnBindWindow();
 
-    private static extern int IGetClientSize(int hwnd, out object width, out object height);
     public bool BindWindow(IntPtr hwnd, string display, string mouse, string keypad, int mode)
     {
         _handle = hwnd;
-        return iBindWindow((int)hwnd, display, mouse, keypad, mode) != 0;
+        return op.BindWindow((int)hwnd, display, mouse, keypad, mode) != 0;
     }
 
-    [DllImport("op_x86.dll")]
-    private static extern int IFindPic(int x1, int y1, int x2, int y2, string files, string delta_color, double sim, int dir, out object x, out object y);
-    [DllImport("op_x86.dll")]
-    private static extern int IGetCursorPos(out object x, out object y);
-    [DllImport("op_x86.dll")]
-    private static extern int IMoveTo(int x, int y);
-    [DllImport("op_x86.dll")]
-    private static extern int ILeftDown();
-    [DllImport("op_x86.dll")]
-    private static extern int ILeftUp();
- 
-    private static extern int IMoveR(int x, int y);
-    [DllImport("op_x86.dll")]
-    private static extern int ILeftClick();
+   
     public bool UnBindWindow()
     {
         _handle = IntPtr.Zero;
 
-        return IUnBindWindow() != 0;
+        return op.UnBindWindow() != 0;
     }
     public (bool, int, int) FindPic(Rectangle rectangle, string files, string delta_color, double sim, int dir)
     {
         object width, height;
         if (rectangle.IsEmpty)
         {
-            IGetClientSize((int)_handle, out width, out height);
-            rectangle = new Rectangle(0, 0, (int)width, (int)height);
+            op.GetClientSize((int)_handle, out width, out height);
+
+            rectangle = new Rectangle(0, 0, (int)width+5, (int)height+5);
+        }
+        else {
+            rectangle = new Rectangle(rectangle.X-5, rectangle.Y-5, rectangle.Width+5, rectangle.Height+5);
         }
         return (FindPic(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, files, delta_color, sim, dir));
     }
@@ -187,34 +174,39 @@ public class MainRobot
     {
 
         object fx, fy;
-
-        return (IFindPic(x1, y1, x2, y2, files, delta_color, sim, dir, out fx, out fy) != 0, (int)fx, (int)fy);
+        bool b = op.FindPic(x1, y1, x2, y2, files, delta_color, sim, dir, out fx, out fy) != -1;
+        //MessageBox.Show(files + "_" + b.ToString());
+        return (b, (int)fx, (int)fy);
     }
 
-    public bool MoveR(int x, int y) => IMoveR(x, y) != 1;
+    public bool MoveR(int x, int y) => op.MoveR(x, y) != 1;
 
-    public bool MoveTo(int x, int y) => IMoveTo(x, y) != 1;
+    public bool MoveTo(int x, int y) => op.MoveTo(x, y) != 1;
 
     //  bool MoveToEx(int x, int y, int w, int h);
 
     public bool LeftClick()
     {
-        object x, y;
-        IGetCursorPos(out x, out y);
-        IMoveTo((int)x, (int)y);
-        ILeftDown();
-        IMoveTo((int)x, (int)y);
-        ILeftUp();
-        return true;
+        //object x, y;
+        //op.GetCursorPos(out x, out y);
+        //op.MoveTo((int)x, (int)y);
+        //op.LeftDown();
+        //op.MoveTo((int)x, (int)y);
+        //op.LeftUp();
+
+
+        return op.LeftClick()!=0;
     }
 
 
-    public bool LeftDown() => ILeftDown() != 1;
+    public bool LeftDown() => op.LeftDown() != 1;
 
-    public bool LeftUp() => ILeftUp() != 1;
+    public bool LeftUp() => op.LeftUp() != 1;
 
 
-
+    public void Capture(Rectangle   rectangle,string name) {
+        op.Capture(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, name + ".bmp");
+    }
 
     void ErrorNoBind()
     {

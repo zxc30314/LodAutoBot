@@ -196,7 +196,7 @@ public partial class Form1 : Form
 
        // MessageBox.Show(robot.Ver());
         bool setBind;
-        setBind = robot.BindWindow(hwnd, "opengl", "windows", "windows", 1);
+        setBind = robot.BindWindow(hwnd, "dx2", "windows", "windows", 1);
         label1.Text = "窗口綁定成功";
         TitleNameBox.Text = process.MainWindowTitle;
         label1.Update();
@@ -795,7 +795,7 @@ public partial class Form1 : Form
         {
             for (int j = 0; j < datas.ElementAt(i).Value.Paths.Length; j++)
             {
-                if (FindPicture(datas.ElementAt(i).Value.Paths[j], 0.7, datas.ElementAt(i).Value.range[j].GetRectangle()).Item1 )
+                if (FindPicture(datas.ElementAt(i).Value.Paths[j], 1, datas.ElementAt(i).Value.range[j].GetRectangle()).Item1 )
                 {
                     ChangeState((State)i);
                 }
@@ -818,7 +818,7 @@ public partial class Form1 : Form
             for (int j = 0; j < imageData.Paths.Length; j++)
             {
 
-                if (FindPicture(imageData.Paths[j], 0.7, imageData.range[j].GetRectangle()).Item1 )
+                if (FindPicture(imageData.Paths[j], 1, imageData.range[j].GetRectangle()).Item1 )
                 {
                     isFindImage = true;
 
@@ -838,7 +838,7 @@ public partial class Form1 : Form
             for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
             {
 
-                if (FindPictureAndClick(imageData.Paths[j], 0.9, imageData.range[j].GetRectangle()) )
+                if (FindPictureAndClick(imageData.Paths[j], 1, imageData.range[j].GetRectangle()) )
                 {
                     isFindImage = true;
                     break;
@@ -859,7 +859,7 @@ public partial class Form1 : Form
             for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
             {
 
-                if (FindPictureAndClick(imageData.Paths[j], 0.9, range.GetRectangle()) )
+                if (FindPictureAndClick(imageData.Paths[j], 1, range.GetRectangle()) )
                 {
                     isFindImage = true;
                     break;
@@ -952,7 +952,11 @@ public partial class Form1 : Form
         if (res)
         {
             robot.MoveTo(intX, intY);
-            robot.LeftClick();
+           
+            robot.LeftDown();
+            
+            robot.MoveTo(intX, intY);
+            robot.LeftUp();
         }
         return res;
     }
@@ -1094,6 +1098,19 @@ public partial class Form1 : Form
         Rect rect = new Rect();
         GetWindowRect(handle, out rect);
         return new Rectangle(rect.Left, rect.Top, (rect.Right - rect.Left) + 1, (rect.Bottom - rect.Top) + 1);
+    }
+
+    private void Button1_Click(object sender, EventArgs e)
+    {
+        bool b;
+        int x, y;
+        (b,x,y)=robot.FindPic(new Rectangle(0,0,0,0), "Map.bmp", "000000", 1, 0);
+
+        Bitmap bitmap = new Bitmap("Map.bmp");
+        if (b) {
+            MessageBox.Show(x.ToString()+","+y.ToString());
+            robot.Capture(new Rectangle(x, y,x+ bitmap.Width,y+ bitmap.Height), "OUT");
+        }
     }
 }
 
