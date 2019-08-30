@@ -30,6 +30,7 @@ partial class Form1
     /// </summary>
     private void InitializeComponent()
     {
+            this.components = new System.ComponentModel.Container();
             this.buttonLoadSetting = new System.Windows.Forms.Button();
             this.buttonSaveSetting = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -39,6 +40,9 @@ partial class Form1
             this.groupBox_Monster = new System.Windows.Forms.GroupBox();
             this.trackBar_Intimacy = new System.Windows.Forms.TrackBar();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.checkBox_Event = new System.Windows.Forms.CheckBox();
+            this.label_地下城 = new System.Windows.Forms.Label();
+            this.trackBar_地下城 = new System.Windows.Forms.TrackBar();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.遠征 = new System.Windows.Forms.CheckBox();
             this.捕捉 = new System.Windows.Forms.CheckBox();
@@ -47,10 +51,12 @@ partial class Form1
             this.rebindButton = new System.Windows.Forms.Button();
             this.TitleNameBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.tabPage2.SuspendLayout();
             this.groupBox_Monster.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_Intimacy)).BeginInit();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_地下城)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.SuspendLayout();
@@ -145,6 +151,9 @@ partial class Form1
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.checkBox_Event);
+            this.tabPage1.Controls.Add(this.label_地下城);
+            this.tabPage1.Controls.Add(this.trackBar_地下城);
             this.tabPage1.Controls.Add(this.buttonLoadSetting);
             this.tabPage1.Controls.Add(this.pictureBox1);
             this.tabPage1.Controls.Add(this.buttonSaveSetting);
@@ -161,6 +170,35 @@ partial class Form1
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "句柄";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_Event
+            // 
+            this.checkBox_Event.AutoSize = true;
+            this.checkBox_Event.Location = new System.Drawing.Point(9, 185);
+            this.checkBox_Event.Name = "checkBox_Event";
+            this.checkBox_Event.Size = new System.Drawing.Size(51, 16);
+            this.checkBox_Event.TabIndex = 13;
+            this.checkBox_Event.Text = "Event";
+            this.checkBox_Event.UseVisualStyleBackColor = true;
+            // 
+            // label_地下城
+            // 
+            this.label_地下城.AutoSize = true;
+            this.label_地下城.Location = new System.Drawing.Point(7, 216);
+            this.label_地下城.Name = "label_地下城";
+            this.label_地下城.Size = new System.Drawing.Size(33, 12);
+            this.label_地下城.TabIndex = 12;
+            this.label_地下城.Text = "label2";
+            // 
+            // trackBar_地下城
+            // 
+            this.trackBar_地下城.LargeChange = 1;
+            this.trackBar_地下城.Location = new System.Drawing.Point(9, 231);
+            this.trackBar_地下城.Maximum = 2;
+            this.trackBar_地下城.Name = "trackBar_地下城";
+            this.trackBar_地下城.Size = new System.Drawing.Size(104, 45);
+            this.trackBar_地下城.TabIndex = 1;
+            this.trackBar_地下城.Scroll += new System.EventHandler(this.TrackBar_地下城_Scroll);
             // 
             // pictureBox1
             // 
@@ -244,6 +282,10 @@ partial class Form1
             this.tabControl1.Size = new System.Drawing.Size(524, 435);
             this.tabControl1.TabIndex = 0;
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -262,6 +304,7 @@ partial class Form1
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_Intimacy)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_地下城)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -287,6 +330,10 @@ partial class Form1
     private System.Windows.Forms.TabControl tabControl1;
     private System.Windows.Forms.TrackBar trackBar_Intimacy;
     private System.Windows.Forms.PictureBox pictureBox1;
+    private System.Windows.Forms.CheckBox checkBox_Event;
+    private System.Windows.Forms.Label label_地下城;
+    private System.Windows.Forms.TrackBar trackBar_地下城;
+    private System.Windows.Forms.Timer timer1;
 }
 
 

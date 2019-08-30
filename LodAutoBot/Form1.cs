@@ -25,9 +25,26 @@ public partial class Form1 : Form
 
         InitializeComponent();
         Start();
-
+       
+        timer1.Interval = 300000;
+        timerSet(null, null);
+        UnderGroundSet(null, null);
+        //timer1.Enabled = checkBox_Event.Checked;
+        checkBox_Event.CheckedChanged += new EventHandler(timerSet);
+        trackBar_地下城.ValueChanged += UnderGroundSet;
+    }
+    int UnderGroundState;
+    void UnderGroundSet(object sender, EventArgs e) {
+        string[] text = new string[] { "封鎖", "協商", "佔領" };
+        label_地下城.Text = text[trackBar_地下城.Value];
+        UnderGroundState = trackBar_地下城.Value;
     }
 
+    void timerSet(object sender, EventArgs e)
+    {
+        timer1.Enabled = checkBox_Event.Checked;
+        isOpenEventPage = checkBox_Event.Checked;
+    }
 
     class ImageData
     {
@@ -54,7 +71,7 @@ public partial class Form1 : Form
 
 
     Process process;
-    string titleName;
+   
 
     Thread mainThread;
     bool isRun;
@@ -80,6 +97,8 @@ public partial class Form1 : Form
     private delegate void UpdateState(string text);
 
     static int intimacyInt;
+
+    bool isOpenEventPage;
 
     private void WriteState(string text)
     {
@@ -238,9 +257,9 @@ public partial class Form1 : Form
     }
 
 
-    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 ,收益報告};
+    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 ,收益報告,EventPage,通知,訪客 };
 
-    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢,村收 }
+    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖,協商封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢,村收,TimeEvent }
 
     public enum Level { 普通, 高級, 稀有, 古代, 傳說, 不滅, 神話, 幻想 }
     public enum UnderGroundLevel { 普通, 高級, 稀有, 古代, 傳說20000,傳說30000,傳說40000, 不滅, 神話 }
@@ -372,11 +391,7 @@ public partial class Form1 : Form
 
     protected override void OnClosed(EventArgs e)
     {
-        if (process != null)
-        {
-            SetWindowText(process.MainWindowHandle, titleName);
-
-        }
+        timer1.Enabled = false;
         StopFind();
         base.OnClosed(e);
     }
@@ -435,12 +450,19 @@ public partial class Form1 : Form
                         break;
                     }
                     Thread.Sleep(500);
-
+                    if (isOpenEventPage)
+                    {
+                        isOpenEventPage = false;
+                        dm.MoveTo(26, 365);
+                        dm.LeftClick();
+                    }
+                    Thread.Sleep(500);
                     if (FindAllPictureAndClick(clickData, ClickImage.村收))
                     {
                         break;
                     }
-                    else {
+                    else
+                    {
 
                         Thread.Sleep(500);
                         if (!FindAllPicture(clickData, ClickImage.探索報告_小) && 遠征.Checked)
@@ -456,7 +478,7 @@ public partial class Form1 : Form
 
                         }
                     }
-                  
+
 
 
 
@@ -660,7 +682,30 @@ public partial class Form1 : Form
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.立即封鎖);
+                    switch (UnderGroundState)
+                    {
+                        case 0:// 封鎖
+                            if (!FindAllPictureAndClick(clickData, ClickImage.立即封鎖))
+                            {
+                                FindAllPictureAndClick(clickData, ClickImage.關閉);
+                            }
+                            break;
+                        case 1://協商
+                            if (!FindAllPictureAndClick(clickData, ClickImage.立即封鎖))
+                            {
+                                FindAllPictureAndClick(clickData, ClickImage.關閉);
+                            }
+                            break;
+                        case 2://佔領
+                            if (!FindAllPictureAndClick(clickData, ClickImage.戰鬥開始))
+                            {
+                                FindAllPictureAndClick(clickData, ClickImage.關閉);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
                     break;
                 case State.桌面:
                     if (!FindAllPictureAndClick(windowsData, State.桌面))
@@ -747,9 +792,21 @@ public partial class Form1 : Form
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.強制封鎖);
 
 
+                    switch (UnderGroundState)
+                    {
+                        case 0:// 封鎖
+                            FindAllPictureAndClick(clickData, ClickImage.強制封鎖);
+                            break;
+                        case 1://協商
+                            FindAllPictureAndClick(clickData, ClickImage.協商封鎖);
+                            break;
+
+                        default:
+                            FindAllPictureAndClick(clickData, ClickImage.關閉);
+                            break;
+                    }
                     break;
                 case State.地下城封鎖完畢:
                     if (!FindAllPictureAndClick(windowsData, State.地下城封鎖完畢))
@@ -769,6 +826,39 @@ public partial class Form1 : Form
                     Thread.Sleep(100);
                     FindAllPictureAndClick(clickData, ClickImage.確認);
 
+                    break;
+                case State.EventPage:
+                    if (!FindAllPicture(windowsData, State.EventPage))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+                    FindAllPictureAndClick(clickData, ClickImage.TimeEvent);
+                    Thread.Sleep(1000);
+                    FindAllPictureAndClick(clickData, ClickImage.確認);
+                    Thread.Sleep(5000);
+                    FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    break;
+                case State.通知:
+
+                    if (!FindAllPicture(windowsData, State.通知))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+                    FindAllPictureAndClick(clickData, ClickImage.確認);
+                    break;
+                case State.訪客:
+
+                    if (!FindAllPicture(windowsData, State.訪客))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
+                    Thread.Sleep(100);
+                    FindAllPictureAndClick(clickData, ClickImage.關閉);
                     break;
                 default:
                     break;
@@ -1116,6 +1206,16 @@ public partial class Form1 : Form
         RECT rect = new RECT();
         GetWindowRect(handle, out rect);
         return new Rectangle(rect.Left, rect.Top, (rect.Right - rect.Left) + 1, (rect.Bottom - rect.Top) + 1);
+    }
+
+    private void Timer1_Tick(object sender, EventArgs e)
+    {
+        isOpenEventPage = true;
+    }
+
+    private void TrackBar_地下城_Scroll(object sender, EventArgs e)
+    {
+
     }
 }
 
