@@ -453,7 +453,7 @@ public partial class Form1 : Form
                     if (isOpenEventPage)
                     {
                         isOpenEventPage = false;
-                        dm.MoveTo(26, 365);
+                        dm.MoveTo(36, 382);
                         dm.LeftClick();
                     }
                     Thread.Sleep(500);
