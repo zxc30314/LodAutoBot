@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace testdm
@@ -13,7 +11,32 @@ namespace testdm
     /// 最新修改：2013-8-23
     /// 修復vs2012 調試自動退出問題
     /// </summary>
-    class CDmSoft : IDisposable
+    /// 
+
+    partial class CDmSoft
+    {
+
+        public bool FindPic(Rectangle rectangle, string pic_name, string delta_color, double sim, int dir, out Point point)
+        {
+            var result = FindPic(_dm, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, pic_name, delta_color, sim, dir, out var x, out var y);
+            point = new Point((int)x, (int)y);
+            return result != -1;
+        }
+
+        public int GetClientSize(int hwnd, out Size size)
+        {
+            var result = GetClientSize(_dm, hwnd, out var width, out var height);
+            size = new Size((int)width, (int)height);
+            return result;
+        }
+
+        public bool MoveTo(Point point)
+        {
+            return MoveTo(point.X, point.Y) != -1;
+        }
+    }
+
+    partial class CDmSoft : IDisposable
     {
         const string DMCNAME = "dmc.dll";
         #region import DLL 函數
@@ -1081,7 +1104,7 @@ namespace testdm
         public string Ver()
         {
             return Marshal.PtrToStringUni(Ver(_dm));
-        }        
+        }
         public int GetBindWindow()
         {
             return GetBindWindow(_dm);
@@ -1783,6 +1806,8 @@ namespace testdm
         {
             return FindPic(_dm, x1, y1, x2, y2, pic_name, delta_color, sim, dir, out x, out y);
         }
+
+
 
         public string FindPicEx(int x1, int y1, int x2, int y2, string pic_name, string delta_color, double sim, int dir)
         {

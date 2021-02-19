@@ -1,110 +1,95 @@
-﻿using System;
+﻿using LodAutoBot;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Threading;
 using System.IO;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using testdm;
-using System.Numerics;
+using System.Linq;
+using System.Threading;
+using System.Windows.Forms;
 
 public partial class Form1 : Form
 {
-  
+
 
 
     public Form1()
     {
-
-
         InitializeComponent();
         Start();
-       
         timer1.Interval = 300000;
-        timerSet(null, null);
+        TimerSet(null, null);
         UnderGroundSet(null, null);
-        //timer1.Enabled = checkBox_Event.Checked;
-        checkBox_Event.CheckedChanged += new EventHandler(timerSet);
+        checkBox_Event.CheckedChanged += new EventHandler(TimerSet);
         trackBar_地下城.ValueChanged += UnderGroundSet;
     }
-    int UnderGroundState;
-    void UnderGroundSet(object sender, EventArgs e) {
+
+    private int UnderGroundState;
+
+    private void UnderGroundSet(object sender, EventArgs e)
+    {
         string[] text = new string[] { "封鎖", "協商", "佔領" };
         label_地下城.Text = text[trackBar_地下城.Value];
         UnderGroundState = trackBar_地下城.Value;
     }
 
-    void timerSet(object sender, EventArgs e)
+    private void TimerSet(object sender, EventArgs e)
     {
         timer1.Enabled = checkBox_Event.Checked;
         isOpenEventPage = checkBox_Event.Checked;
     }
 
-    class ImageData
-    {
-
-        public string[] Paths;
-        public Range[] range;
-        public Color TextColor;
-        public ImageData(string[] s, Range[] r)
-        {
-
-            Paths = s;
-            range = r;
-
-        }
-
-        public ImageData()
-        {
-
-            Paths = new string[0];
-            range = new Range[0];
-            TextColor = Color.Black;
-        }
-    }
-
-
-    Process process;
-   
-
-    Thread mainThread;
-    bool isRun;
-    static string ImagePath = Path.Combine(Application.StartupPath, "Image");
-
-    static string clickImagePath = Path.Combine(ImagePath, "Click");
-    static string windowsStateImagePath = Path.Combine(ImagePath, "Windows");
-    static string monsterImagePath = Path.Combine(ImagePath, "Monster");
-    static string underGroundImagePath = Path.Combine(ImagePath, "UnderGround");
-    static string intimacyImagePath = Path.Combine(ImagePath, "Intimacy");
-
-    Dictionary<string, ImageData> windowsData = new Dictionary<string, ImageData>();
-    Dictionary<string, ImageData> clickData = new Dictionary<string, ImageData>();
-    Dictionary<string, ImageData> monsterData = new Dictionary<string, ImageData>();
-    Dictionary<string, ImageData> underGroundData = new Dictionary<string, ImageData>();
-    Dictionary<string, ImageData> intimacyData = new Dictionary<string, ImageData>();
-
-    CheckBox[] checkBoxes_Monster = new CheckBox[Enum.GetNames(typeof(Level)).Length];
-    CheckBox[] checkBoxes_UnderGround = new CheckBox[Enum.GetNames(typeof(Level)).Length];
-    Color[] color_TextLevel = new Color[] { HexToColor("#7c7c7c"), HexToColor("#8cc067"), HexToColor("#4274c6"), HexToColor("#9463c7"), HexToColor("#d8733c"), HexToColor("#ba3230"), HexToColor("#ffe71b"), HexToColor("#ff00dd") };
-    Color[] color_UnderGroundMonsterLevel = new Color[] { HexToColor("#323232"), HexToColor("#2F5648"), HexToColor("#624730"), HexToColor("#563243"), HexToColor("#34558B"), HexToColor("#202263") };
-
+    private readonly DmControll dm = new DmControll();
+    private Thread mainThread;
+    private static readonly string ImagePath = Path.Combine(Application.StartupPath, "Image");
+    private static readonly string clickImagePath = Path.Combine(ImagePath, "Click");
+    private static readonly string windowsStateImagePath = Path.Combine(ImagePath, "Windows");
+    private static readonly string monsterImagePath = Path.Combine(ImagePath, "Monster");
+    private static readonly string underGroundImagePath = Path.Combine(ImagePath, "UnderGround");
+    private static readonly string intimacyImagePath = Path.Combine(ImagePath, "Intimacy");
+    private Dictionary<string, ImageData> windowsData = new Dictionary<string, ImageData>();
+    private Dictionary<string, ImageData> clickData = new Dictionary<string, ImageData>();
+    private Dictionary<string, ImageData> monsterData = new Dictionary<string, ImageData>();
+    private Dictionary<string, ImageData> underGroundData = new Dictionary<string, ImageData>();
+    private Dictionary<string, ImageData> intimacyData = new Dictionary<string, ImageData>();
+    private Dictionary<Level, CheckBoxControll> expeditionUnderGround = new Dictionary<Level, CheckBoxControll>();
+    private Dictionary<Level, CheckBoxControll> catchMonsters = new Dictionary<Level, CheckBoxControll>();
     private delegate void UpdateState(string text);
 
-    static int intimacyInt;
+    private static int intimacyInt;
+    private bool isOpenEventPage;
 
-    bool isOpenEventPage;
+    public Dictionary<Level, CheckBoxControll> CreatCheckBoxControll(GroupBox groupBox)
+    {
+        Dictionary<Level, CheckBoxControll> checkBoxControll = new Dictionary<Level, CheckBoxControll>();
 
+        (Level level, Color color)[] data = new (Level level, Color color)[]
+        {
+           (Level.普通,Tools.HexToColor("#7c7c7c")),
+           (Level.高級,Tools.HexToColor("#8cc067")),
+           (Level.稀有,Tools.HexToColor("#4274c6")),
+           (Level.古代,Tools.HexToColor("#9463c7")),
+           (Level.傳說,Tools.HexToColor("#d8733c")),
+           (Level.不滅,Tools.HexToColor("#ba3230")),
+           (Level.神話,Tools.HexToColor("#ffe71b")),
+           (Level.幻想,Tools.HexToColor("#ff00dd"))
+        };
+        int height = 0;
+        int offsetY = 2;
+        foreach ((Level level, Color color) item in data)
+        {
+            CheckBoxControll temp = new CheckBoxControll(item);
+            temp.AddTo(groupBox, height);
+            checkBoxControll.Add(item.level, temp);
+            height += temp.Size.Height + offsetY;
+        }
+        return checkBoxControll;
+    }
     private void WriteState(string text)
     {
         if (label1.InvokeRequired)
         {
-            var d = new UpdateState(WriteState);
+            UpdateState d = new UpdateState(WriteState);
             Invoke(d, new object[] { text });
         }
         else
@@ -114,175 +99,52 @@ public partial class Form1 : Form
         }
     }
 
-    static Color HexToColor(string hex)
-    {
-        string color = hex;
-        if (color.StartsWith("#"))
-            color = color.Remove(0, 1);
-        byte r, g, b;
-        if (color.Length == 3)
-        {
-            r = Convert.ToByte(color[0] + "" + color[0], 16);
-            g = Convert.ToByte(color[1] + "" + color[1], 16);
-            b = Convert.ToByte(color[2] + "" + color[2], 16);
-        }
-        else if (color.Length == 6)
-        {
-            r = Convert.ToByte(color[0] + "" + color[1], 16);
-            g = Convert.ToByte(color[2] + "" + color[3], 16);
-            b = Convert.ToByte(color[4] + "" + color[5], 16);
-        }
-        else
-        {
-            throw new ArgumentException("Hex color " + color + " is invalid.");
-        }
-        return Color.FromArgb(255, r, g, b);
-    }
-    void Start()
+    private void Start()
     {
 
         ButtonLoadSetting_Click(null, null);
+        expeditionUnderGround = CreatCheckBoxControll(groupBox_UnderGround);
+        catchMonsters = CreatCheckBoxControll(groupBox_Monster);
 
-        AddCheckBoxes(groupBox_Monster, checkBoxes_Monster);
-
-        AddCheckBoxes(groupBox_UnderGround, checkBoxes_UnderGround);
-        trackBar_Intimacy.ValueChanged += new System.EventHandler(this.SetIntimacy);
-        SetButton();
+        trackBar_Intimacy.ValueChanged += new System.EventHandler(SetIntimacy);
+        SetButton(false, false);
     }
 
-    void SetIntimacy(object sender, EventArgs e)
+    private void SetIntimacy(object sender, EventArgs e)
     {
         intimacyInt = trackBar_Intimacy.Value;
         label_Intimacy.Text = ((Intimacy)trackBar_Intimacy.Value).ToString();
     }
 
-    void AddCheckBoxes(GroupBox groupBox, CheckBox[] checkBoxes)
-    {
 
 
-        int left = 30, top = 20;
-
-        for (int i = 0; i < checkBoxes.Length; i++)
-        {
-            checkBoxes[i] = new CheckBox();
-            checkBoxes[i].Top = top;
-            checkBoxes[i].Left = left;
-            checkBoxes[i].Text = ((Level)i).ToString();
-            checkBoxes[i].ForeColor = color_TextLevel[i];
-            groupBox.Controls.Add(checkBoxes[i]);
-
-            top += checkBoxes[i].Height + 2;
-        }
-
-
-    }
-
-    CDmSoft dm;
-    IntPtr hwnd;
     public State state;
-    public bool isBind;
 
-
-
-
-
-
-
-
-    [DllImport("user32.dll")]
-    static extern int SetWindowText(IntPtr hWnd, string text);
-
-    void bindButton_Click(object sender, EventArgs e)
+    private void SetButton(bool isBinding, bool isRun)
     {
-      
-
-
-
-    }
-
-    void BindWindow() {
-
-        dm = new CDmSoft();
-      
-
-     
-         process=Process.GetProcessById(CurWindow.ProcessId);
-
-    
-      
-
-        hwnd = process.MainWindowHandle;
-        
-       
-        int setBind;
-        setBind = dm.BindWindow((int)hwnd, "dx2", "windows3", "windows", 1);
-        if (setBind == 1)
-        {
-            label1.Text = "窗口綁定成功";
-        }
-        else {
-            label1.Text = "窗口綁定失敗";
-        }
-        TitleNameBox.Text = process.MainWindowTitle;
-        label1.Update();
-      
-        isBind = setBind==1;
-
-        SetButton();
-    }
-    void SetButton()
-    {
-        
-        rebindButton.Enabled = isBind;
-        TitleNameBox.Enabled = !isBind;
-        buttonStartFind.Enabled = isBind && !isRun;
-        buttonStopFind.Enabled = isBind && isRun;
-        pictureBox1.Enabled = !isBind;
-
-    }
-
-    private void rebindButton_Click(object sender, EventArgs e)
-    {
-        if (process != null)
-        {
-           
-            StopFind();
-            isBind = !(dm.UnBindWindow() == 1);
-            process = null;
-            dm = null;
-            SetButton();
-         
-            label1.Text = "解除綁定";
-        }
+        rebindButton.Enabled = isBinding;
+        TitleNameBox.Enabled = false;
+        buttonStartFind.Enabled = isBinding && !isRun;
+        buttonStopFind.Enabled = isBinding && isRun;
+        pictureBox1.Enabled = !isBinding;
     }
 
 
-    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵 ,收益報告,EventPage,通知,訪客 };
 
-    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖,協商封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢,村收,TimeEvent }
+
+    public enum State { 未知, 地圖, 地區, 探索完畢, 發現怪物, 選擇同伴, 戰鬥中, 結算介面, 捕捉怪物機會, 捕捉到怪物, 製造所, 發現地下城, 桌面, 封鎖地下城, 地下城封鎖完畢, 找地下城, 別人領地, 地下城目錄, 地下城發現獎勵, 收益報告, EventPage, 通知, 訪客 };
+
+    public enum ClickImage { 地圖, 探索完畢_白, 探索完畢_藍, 再一次, 問候, 嘗試捕捉, 戰鬥開始, Skip, 結算介面, 關閉, 確認, 立即封鎖, 強制封鎖, 協商封鎖, 探索報告_小, 遠征, 開始遠征, 探索其他領地, 地下城資訊, 前往地下城, 地下城封鎖完畢, 村收, TimeEvent }
 
     public enum Level { 普通, 高級, 稀有, 古代, 傳說, 不滅, 神話, 幻想 }
-    public enum UnderGroundLevel { 普通, 高級, 稀有, 古代, 傳說20000,傳說30000,傳說40000, 不滅, 神話 }
+    public enum UnderGroundLevel { 普通, 高級, 稀有, 古代, 傳說20000, 傳說30000, 傳說40000, 不滅, 神話 }
     public enum Intimacy { 非常警戒, 警戒, 熟悉, 親近, 信賴 }
-    void ChangeState(State mstate)
+
+    private void ChangeState(State mstate)
     {
-        this.state = mstate;
+        state = mstate;
         WriteState(mstate.ToString());
     }
-
-
-    class SettingData
-    {
-
-        public SettingData()
-        {
-
-        }
-        public string[] picturePath = new string[11];
-
-
-    }
-
 
     private void ButtonSaveSetting_Click(object sender, EventArgs e)
     {
@@ -304,7 +166,8 @@ public partial class Form1 : Form
         SetImageData(underGroundImagePath, typeof(Level), ref underGroundData);
         SetImageData(intimacyImagePath, typeof(Intimacy), ref intimacyData);
     }
-    void ChichExists(string imagePath, Type typef)
+
+    private void ChichExists(string imagePath, Type typef)
     {
         string tempPath = string.Empty;
         if (!Directory.Exists(imagePath))
@@ -322,55 +185,54 @@ public partial class Form1 : Form
         }
     }
 
-    (bool, ImageData) ReImageData(string path, string childPath)
+    private (bool isOK, ImageData data) LoadImageData(string path, string childPath)
     {
+        DirectoryInfo directory = new DirectoryInfo(Path.Combine(path, childPath));
 
-
-
-        DirectoryInfo di = new DirectoryInfo(Path.Combine(path, childPath));
-        bool haveFile = false;
-        try
+        (bool, ImageData) result = (false, null);
+        if (directory.Exists)
         {
-            haveFile = Directory.GetFiles(di.FullName, "*.Bmp").Length != 0;
-
-        }
-        catch (Exception)
-        {
-
-
-        }
-        if (haveFile)
-        {
-
-            FileInfo[] file;
-            file = di.GetFiles("*.Bmp");
-            var tempImagePath = file.Select((x) => x.FullName);
-
-            var tempRange = file.Select((x) => new Range(x.Name.Split('.')[0].Split(',').Select((s, i) => int.TryParse(s, out i) ? i : -1).ToArray()));
-            Range[] iii = new Range[1];
-            return (true, new ImageData(tempImagePath.ToArray(), tempRange.ToArray()));
-
+            bool haveFile = Directory.GetFiles(directory.FullName, "*.Bmp").Length != 0;
+            if (haveFile)
+            {
+                FileInfo[] file;
+                file = directory.GetFiles("*.Bmp");
+                IEnumerable<string> tempImagePath = file.Select((x) => x.FullName);
+                IEnumerable<Rectangle> tempRange = file.Select(ToSelect);
+                result = (true, new ImageData(tempImagePath.ToArray(), tempRange.ToArray()));
+            }
         }
 
-
-        return (false, null);
-
-
-
+        Rectangle ToSelect(FileInfo fileName)
+        {
+            string temp = Path.GetFileNameWithoutExtension(fileName.FullName);
+            int[] values = temp.Split(',').Select(TryParseInt32).ToArray();
+            Rectangle tempResult = default;
+            if (values.Length == 4)
+            {
+                tempResult = new Rectangle(values[0], values[1], values[2], values[3]);
+            }
+            return tempResult;
+        }
+        int TryParseInt32(string text)
+        {
+            return int.TryParse(text, out int value) ? value : 0;
+        }
+        return result;
     }
 
-    void SetImageData(string path, Type childPath, ref Dictionary<string, ImageData> dic)
+    private void SetImageData(string path, Type childPath, ref Dictionary<string, ImageData> dic)
     {
         dic.Clear();
-        bool b;
+        bool isOk;
         ImageData image;
 
         for (int i = 0; i < Enum.GetNames(childPath).Length; i++)
         {
 
-            (b, image) = ReImageData(path, Enum.GetName(childPath, i));
+            (isOk, image) = LoadImageData(path, Enum.GetName(childPath, i));
 
-            if (b)
+            if (isOk)
             {
                 dic.Add(Enum.GetName(childPath, i), image);
             }
@@ -408,7 +270,7 @@ public partial class Form1 : Form
         StopFind();
     }
 
-    void MouseDrop(int x, int y, int count)
+    private void MouseDrop(int x, int y, int count)
     {
         dm.MoveTo(800, 450);
         dm.LeftDown();
@@ -420,31 +282,26 @@ public partial class Form1 : Form
         dm.LeftUp();
 
     }
-    void MainThread()
+
+    private void MainThread()
     {
         bool isFind = false;
-        bool isFindEnd = false;
         bool expeditionNotFind = false;
         ChangeState(State.未知);
         while (true)
         {
-
             Thread.Sleep(500);
-
-
-            //  MessageBox.Show(isFind.ToString() + " " + AllFindEnd.ToString());
 
             switch (state)
             {
                 case State.未知:
-
 
                     RestWindows(windowsData);
                     Thread.Sleep(100);
 
                     break;
                 case State.地圖:
-                    if (!FindAllPicture(windowsData, State.地圖))
+                    if (!dm.FindAllPicture(windowsData, State.地圖))
                     {
                         ChangeState(State.未知);
                         break;
@@ -457,117 +314,103 @@ public partial class Form1 : Form
                         dm.LeftClick();
                     }
                     Thread.Sleep(500);
-                    if (FindAllPictureAndClick(clickData, ClickImage.村收))
+                    if (dm.FindAllPictureAndClick(clickData, ClickImage.村收))
                     {
                         break;
                     }
                     else
                     {
-
                         Thread.Sleep(500);
-                        if (!FindAllPicture(clickData, ClickImage.探索報告_小) && 遠征.Checked)
+                        if (!dm.FindAllPicture(clickData, ClickImage.探索報告_小) && 遠征.Checked)
                         {
-
-                            FindAllPictureAndClick(clickData, ClickImage.遠征);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.遠征);
                         }
 
-                        else if (FindAllPicture(clickData, ClickImage.探索報告_小))
+                        else if (dm.FindAllPicture(clickData, ClickImage.探索報告_小))
                         {
 
-                            FindAllPictureAndClick(clickData, ClickImage.地圖);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.地圖);
 
                         }
                     }
 
-
-
-
-
                     break;
                 case State.地區:
 
-
-                    isFind = isFindEnd = false;
-
                     //拖動
 
-                    //MessageBox.Show(isFind.ToString());
                     Thread.Sleep(100);
-                    if (!FindAllPicture(windowsData, State.地區))
+                    if (!dm.FindAllPicture(windowsData, State.地區))
                     {
                         ChangeState(State.未知);
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
                     Thread.Sleep(100);
 
-                    if (!FindAllPictureAndClick(clickData, ClickImage.探索完畢_白) && !FindAllPicture(clickData, ClickImage.探索完畢_藍))
+                    if (!dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_白) && !dm.FindAllPicture(clickData, ClickImage.探索完畢_藍))
                     {
-
                         int[] x = new int[] { 10, -1, 0, 1, 0 };
                         int[] y = new int[] { 10, 0, -1, -0, 1 };
                         int[] count = new int[] { 1, 4, 2, 4, 2 };
                         for (int i = 0; i < x.Length; i++)
                         {
-
                             if (!isFind)
                             {
                                 DoMouseDropLoop(x[i], y[i], count[i]);
                             }
                             else
                             {
-                                FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
+                                isFind = dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
                             }
                             Thread.Sleep(100);
-                            if (!FindAllPicture(windowsData, State.地區))
-                            {
-                                ChangeState(State.未知);
-                                break;
-                            }
-                            Thread.Sleep(1000);
 
-                            //   MessageBox.Show(isFindEnd.ToString());
                         }
-                        FindAllPictureAndClick(clickData, ClickImage.關閉);
+                        if (!isFind)
+                        {
+                            dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
+                        }
 
                     }
-                    Thread.Sleep(500);
 
-
-
-
-
+                    Thread.Sleep(300);
+                    if (!dm.FindAllPicture(windowsData, State.地區))
+                    {
+                        ChangeState(State.未知);
+                        break;
+                    }
 
                     void DoMouseDropLoop(int tx, int ty, int tcount)
                     {
                         for (int i = 0; i < tcount; i++)
                         {
-                            if (FindAllPictureAndClick(clickData, ClickImage.探索完畢_白))
+
+                            if (dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_白) || !dm.FindAllPicture(windowsData, State.地區))
                             {
                                 isFind = true;
                                 break;
                             }
-                            Thread.Sleep(100);
+                            Thread.Sleep(300);
                             MouseDrop(tx, ty, 30);
-                            Thread.Sleep(200);
+                            Thread.Sleep(300);
                         }
                     }
 
                     break;
                 case State.探索完畢:
-                    if (!FindAllPicture(windowsData, State.探索完畢))
+                    if (!dm.FindAllPicture(windowsData, State.探索完畢))
                     {
                         ChangeState(State.未知);
                         break;
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.再一次);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.再一次);
 
                     break;
                 case State.發現怪物:
-                    if (!FindAllPicture(windowsData, State.發現怪物))
+                    if (!dm.FindAllPicture(windowsData, State.發現怪物))
                     {
                         ChangeState(State.未知);
                         break;
@@ -577,37 +420,35 @@ public partial class Form1 : Form
 
                     if (!捕捉.Checked)
                     {
-                        FindAllPictureAndClick(clickData, ClickImage.問候);//問候
+                        dm.FindAllPictureAndClick(clickData, ClickImage.問候);//問候
 
                         break;
                     }
                     isFind = false;
+
                     for (int i = 0; i < Enum.GetNames(typeof(Level)).Length; i++)
                     {
-                        if (checkBoxes_Monster[i].Checked && FindAllPicture(monsterData, (Level)i))
+                        if (catchMonsters[(Level)i].Checked && dm.FindAllPicture(monsterData, (Level)i))
                         {
 
                             for (int j = intimacyInt; j < Enum.GetNames(typeof(Intimacy)).Length; j++)
                             {
 
-                                if (FindAllPicture(intimacyData, (Intimacy)j))
+                                if (dm.FindAllPicture(intimacyData, (Intimacy)j))
                                 {
                                     isFind = true;
 
-                                    FindAllPictureAndClick(clickData, ClickImage.嘗試捕捉);//捕捉
+                                    dm.FindAllPictureAndClick(clickData, ClickImage.嘗試捕捉);//捕捉
                                     break;
                                 }
                             }
-
-
                         }
-
                     }
 
                     if (!isFind)
                     {
 
-                        FindAllPictureAndClick(clickData, ClickImage.問候);//問候
+                        dm.FindAllPictureAndClick(clickData, ClickImage.問候);//問候
 
                     }
 
@@ -616,66 +457,66 @@ public partial class Form1 : Form
 
                     break;
                 case State.選擇同伴:
-                    if (!FindAllPicture(windowsData, State.選擇同伴))
+                    if (!dm.FindAllPicture(windowsData, State.選擇同伴))
                     {
                         ChangeState(State.未知);
                         break;
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.戰鬥開始);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.戰鬥開始);
                     break;
                 case State.戰鬥中:
-                    if (!FindAllPicture(windowsData, State.戰鬥中))
+                    if (!dm.FindAllPicture(windowsData, State.戰鬥中))
                     {
                         ChangeState(State.未知);
                         break;
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.Skip);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.Skip);
                     break;
                 case State.結算介面:
-                    if (!FindAllPicture(windowsData, State.結算介面))
+                    if (!dm.FindAllPicture(windowsData, State.結算介面))
                     {
                         ChangeState(State.未知);
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.結算介面);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.結算介面);
                     break;
                 case State.捕捉怪物機會:
-                    if (!FindAllPicture(windowsData, State.捕捉怪物機會))
+                    if (!dm.FindAllPicture(windowsData, State.捕捉怪物機會))
                     {
                         ChangeState(State.未知);
                         break;
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                     break;
                 case State.捕捉到怪物:
-                    if (!FindAllPicture(windowsData, State.捕捉到怪物))
+                    if (!dm.FindAllPicture(windowsData, State.捕捉到怪物))
                     {
                         ChangeState(State.未知);
                         break;
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.確認);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.確認);
                     break;
                 case State.製造所:
-                    if (!FindAllPicture(windowsData, State.製造所))
+                    if (!dm.FindAllPicture(windowsData, State.製造所))
                     {
                         ChangeState(State.未知);
                         break;
                     }
 
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                     break;
                 case State.發現地下城:
-                    if (!FindAllPicture(windowsData, State.發現地下城))
+                    if (!dm.FindAllPicture(windowsData, State.發現地下城))
                     {
                         ChangeState(State.未知);
                         break;
@@ -685,21 +526,21 @@ public partial class Form1 : Form
                     switch (UnderGroundState)
                     {
                         case 0:// 封鎖
-                            if (!FindAllPictureAndClick(clickData, ClickImage.立即封鎖))
+                            if (!dm.FindAllPictureAndClick(clickData, ClickImage.立即封鎖))
                             {
-                                FindAllPictureAndClick(clickData, ClickImage.關閉);
+                                dm.FindAllPictureAndClick(clickData, ClickImage.強制封鎖);
                             }
                             break;
                         case 1://協商
-                            if (!FindAllPictureAndClick(clickData, ClickImage.立即封鎖))
+                            if (!dm.FindAllPictureAndClick(clickData, ClickImage.立即封鎖))
                             {
-                                FindAllPictureAndClick(clickData, ClickImage.關閉);
+                                dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                             }
                             break;
                         case 2://佔領
-                            if (!FindAllPictureAndClick(clickData, ClickImage.戰鬥開始))
+                            if (!dm.FindAllPictureAndClick(clickData, ClickImage.戰鬥開始))
                             {
-                                FindAllPictureAndClick(clickData, ClickImage.關閉);
+                                dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                             }
                             break;
                         default:
@@ -708,7 +549,7 @@ public partial class Form1 : Form
 
                     break;
                 case State.桌面:
-                    if (!FindAllPictureAndClick(windowsData, State.桌面))
+                    if (!dm.FindAllPictureAndClick(windowsData, State.桌面))
                     {
                         ChangeState(State.未知);
                         break;
@@ -716,7 +557,7 @@ public partial class Form1 : Form
                     Thread.Sleep(100);
                     break;
                 case State.找地下城:
-                    if (!FindAllPicture(windowsData, State.找地下城))
+                    if (!dm.FindAllPicture(windowsData, State.找地下城))
                     {
                         ChangeState(State.未知);
                         break;
@@ -724,10 +565,10 @@ public partial class Form1 : Form
 
                     expeditionNotFind = false;
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.開始遠征);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.開始遠征);
                     break;
                 case State.別人領地:
-                    if (!FindAllPicture(windowsData, State.別人領地))
+                    if (!dm.FindAllPicture(windowsData, State.別人領地))
                     {
                         ChangeState(State.未知);
                         break;
@@ -736,18 +577,18 @@ public partial class Form1 : Form
                     Thread.Sleep(100);
                     if (expeditionNotFind)
                     {
-                        FindAllPictureAndClick(clickData, ClickImage.探索其他領地);
+                        dm.FindAllPictureAndClick(clickData, ClickImage.探索其他領地);
                         expeditionNotFind = false;
                     }
                     else
                     {
-                        FindAllPictureAndClick(clickData, ClickImage.地下城資訊);
+                        dm.FindAllPictureAndClick(clickData, ClickImage.地下城資訊);
                     }
 
                     break;
                 case State.地下城目錄:
 
-                    if (!FindAllPicture(windowsData, State.地下城目錄))
+                    if (!dm.FindAllPicture(windowsData, State.地下城目錄))
                     {
                         ChangeState(State.未知);
                         break;
@@ -757,12 +598,11 @@ public partial class Form1 : Form
                     //407,256,635,876
                     for (int i = Enum.GetNames(typeof(Level)).Length - 1; i >= 0; i--)
                     {
-
-                        if (checkBoxes_UnderGround[i].Checked && FindAllPictureAndClick(underGroundData, (Level)i, new Range(127, 259, 635, 876)))
+                        if (expeditionUnderGround[(Level)i].Checked && dm.FindAllPictureAndClick(underGroundData, (Level)i, new Rectangle(127, 259, 635, 876)))
                         {
                             expeditionNotFind = false;
                             Thread.Sleep(100);
-                            FindAllPictureAndClick(clickData, ClickImage.前往地下城);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.前往地下城);
                             break;
                         }
                         else
@@ -772,12 +612,12 @@ public partial class Form1 : Form
                     }
                     if (expeditionNotFind)
                     {
-                        FindAllPictureAndClick(clickData, ClickImage.關閉);
+                        dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                     }
 
                     break;
                 case State.地下城發現獎勵:
-                    if (!FindAllPictureAndClick(windowsData, State.地下城發現獎勵))
+                    if (!dm.FindAllPictureAndClick(windowsData, State.地下城發現獎勵))
                     {
                         ChangeState(State.未知);
                         break;
@@ -786,7 +626,7 @@ public partial class Form1 : Form
 
                     break;
                 case State.封鎖地下城:
-                    if (!FindAllPicture(windowsData, State.封鎖地下城))
+                    if (!dm.FindAllPicture(windowsData, State.封鎖地下城))
                     {
                         ChangeState(State.未知);
                         break;
@@ -797,19 +637,19 @@ public partial class Form1 : Form
                     switch (UnderGroundState)
                     {
                         case 0:// 封鎖
-                            FindAllPictureAndClick(clickData, ClickImage.強制封鎖);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.強制封鎖);
                             break;
                         case 1://協商
-                            FindAllPictureAndClick(clickData, ClickImage.協商封鎖);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.協商封鎖);
                             break;
 
                         default:
-                            FindAllPictureAndClick(clickData, ClickImage.關閉);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                             break;
                     }
                     break;
                 case State.地下城封鎖完畢:
-                    if (!FindAllPictureAndClick(windowsData, State.地下城封鎖完畢))
+                    if (!dm.FindAllPictureAndClick(windowsData, State.地下城封鎖完畢))
                     {
                         ChangeState(State.未知);
                         break;
@@ -818,156 +658,55 @@ public partial class Form1 : Form
 
                     break;
                 case State.收益報告:
-                    if (!FindAllPictureAndClick(windowsData, State.收益報告))
+                    if (!dm.FindAllPicture(windowsData, State.收益報告))
                     {
                         ChangeState(State.未知);
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.確認);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.確認);
 
                     break;
                 case State.EventPage:
-                    if (!FindAllPicture(windowsData, State.EventPage))
+                    if (!dm.FindAllPicture(windowsData, State.EventPage))
                     {
                         ChangeState(State.未知);
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.TimeEvent);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.TimeEvent);
                     Thread.Sleep(1000);
-                    FindAllPictureAndClick(clickData, ClickImage.確認);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.確認);
                     Thread.Sleep(5000);
-                    FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                     break;
                 case State.通知:
 
-                    if (!FindAllPicture(windowsData, State.通知))
+                    if (!dm.FindAllPicture(windowsData, State.通知))
                     {
                         ChangeState(State.未知);
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.確認);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.確認);
                     break;
                 case State.訪客:
 
-                    if (!FindAllPicture(windowsData, State.訪客))
+                    if (!dm.FindAllPicture(windowsData, State.訪客))
                     {
                         ChangeState(State.未知);
                         break;
                     }
                     Thread.Sleep(100);
-                    FindAllPictureAndClick(clickData, ClickImage.關閉);
+                    dm.FindAllPictureAndClick(clickData, ClickImage.關閉);
                     break;
                 default:
                     break;
             }
-
-
-
         }
-
-
-    }
-    (bool b, ImageData image) FindImageData(Dictionary<string, ImageData> datas, Enum type)
-    {
-
-        if (datas.ContainsKey(type.ToString()))
-        {
-
-            return (true, datas[type.ToString()]);
-        }
-
-
-        return (false, null);
-
     }
 
-    void RestWindows(Dictionary<string, ImageData> datas)
-    {
-
-        for (int i = 1; i < datas.Count; i++)
-        {
-            for (int j = 0; j < datas.ElementAt(i).Value.Paths.Length; j++)
-            {
-                if (FindPicture(datas.ElementAt(i).Value.Paths[j], 0.7, datas.ElementAt(i).Value.range[j]).Item1 != -1)
-                {
-                    ChangeState((State)i);
-                }
-            }
-
-        }
-
-    }
-
-
-    bool FindAllPicture(Dictionary<string, ImageData> imageDatas, Enum data)
-    {
-        bool isFindImage = false;
-
-
-        // (isFindData, imageData) = FindImageData(imageDatas, data);
-        if (imageDatas.ContainsKey(data.ToString()))
-        {
-            ImageData imageData = imageDatas[data.ToString()];
-            for (int j = 0; j < imageData.Paths.Length; j++)
-            {
-
-                if (FindPicture(imageData.Paths[j], 0.7, imageData.range[j]).Item1 != -1)
-                {
-                    isFindImage = true;
-
-                }
-            }
-        }
-        return isFindImage;
-    }
-    bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data)
-    {
-        bool isFindImage = false;
-
-        if (imageDatas.ContainsKey(data.ToString()))
-        {
-            ImageData imageData = imageDatas[data.ToString()];
-
-            for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
-            {
-
-                if (FindPictureAndClick(imageData.Paths[j], 0.7, imageData.range[j]) != -1)
-                {
-                    isFindImage = true;
-                    break;
-
-                }
-            }
-        }
-        return isFindImage;
-    }
-    bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, Range range)
-    {
-        bool isFindImage = false;
-
-        if (imageDatas.ContainsKey(data.ToString()))
-        {
-            ImageData imageData = imageDatas[data.ToString()];
-
-            for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
-            {
-
-                if (FindPictureAndClick(imageData.Paths[j], 0.7, range) != -1)
-                {
-                    isFindImage = true;
-                    break;
-
-                }
-            }
-        }
-        return isFindImage;
-    }
-
-    //開始找探險完畢
-    void StartFind()
+    private void StartFind()
     {
         mainThread = new Thread(MainThread);
 
@@ -976,11 +715,11 @@ public partial class Form1 : Form
             return;
 
         }
-        isRun = true;
-        SetButton();
         mainThread.Start();
+        SetButton(true, IsRunning());
     }
-    void StopFind()
+
+    private void StopFind()
     {
         if (mainThread == null)
         {
@@ -991,222 +730,71 @@ public partial class Form1 : Form
             return;
 
         }
-        isRun = false;
-     
-        SetButton();
+
         mainThread.Abort();
+        SetButton(true, IsRunning());
     }
 
-    class Range
+    private void RestWindows(Dictionary<string, ImageData> datas)
     {
-        public int x1, y1, x2, y2;
-        public Range(int x1, int y1, int x2, int y2)
+
+        for (int i = 1; i < datas.Count; i++)
         {
-            this.x1 = x1;
-            this.y1 = y1;
-            this.x2 = x2;
-            this.y2 = y2;
-        }
-        public Range(int[] i)
-        {
-            if (i.Length == 4)
+            for (int j = 0; j < datas.ElementAt(i).Value.Paths.Length; j++)
             {
-                this.x1 = i[0];
-                this.y1 = i[1];
-                this.x2 = i[2];
-                this.y2 = i[3];
-            }
-            else
-            {
-                x1 = 0;
-                y1 = 0;
-                x2 = 2000;
-                y2 = 2000;
+                if (dm.FindPicture(datas.ElementAt(i).Value.Paths[j], 0.7, datas.ElementAt(i).Value.Rectangle[j]).isFind)
+                {
+                    ChangeState((State)i);
+                }
             }
 
         }
 
     }
-
-
-
-    (int, int, int) FindPicture(string picturePath, double sim, Range rectangle = null)
+    private bool IsRunning()
     {
-
-        object x1 = 0;
-        object y1 = 0;
-        object x2 = 0;
-        object y2 = 0;
-        object fx, fy;
-        if (rectangle == null)
-        {
-            x1 = 0;
-            y1 = 0;
-            dm.GetClientSize((int)hwnd, out x2, out y2);
-        }
-        else
-        {
-            x1 = rectangle.x1;
-            y1 = rectangle.y1;
-            x2 = rectangle.x2;
-            y2 = rectangle.y2;
-        }
-
-        int res = dm.FindPic((int)x1 - 5, (int)y1 - 5, (int)x2 + 5, (int)y2 + 5, picturePath, "000000", sim, 0, out fx, out fy);
-
-        return (res, (int)fx, (int)fy);
+        return mainThread != null && mainThread.IsAlive;
     }
 
-    int FindPictureAndClick(string picturePath, double sim, Range rectangle = null)
-    {
-        (int res, int intX, int intY) = FindPicture(picturePath, sim, rectangle);
-
-        if (res >= 0)
-        {
-            dm.MoveTo(intX, intY);
-            dm.LeftClick();
-        }
-        return res;
-    }
-
-    void StartBattle()
-    {
-
-    }
-
-
-
-    void BattleSkip()
-    {
-
-    }
-
-
-
-    private void Form1_Load_1(object sender, EventArgs e)
-    {
-
-    }
-
+    #region View
     private void PictureBox1_Click(object sender, EventArgs e)
     {
 
     }
 
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
-    {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
-    }
-
-    public const int WM_GETTEXT = 0xD;
-    public const int WM_GETTEXTLENGTH = 0x000E;
-
-    [DllImport("user32.dll")]
-    public static extern IntPtr WindowFromPoint(Point point);
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern int GetClassName(IntPtr handle, StringBuilder ClassName, int MaxCount);
-
-    [DllImport("user32.dll")]
-    public static extern int SendMessage(IntPtr handle, int msg, int Param1, int Param2);
-
-    [DllImport("user32.dll")]
-    public static extern int SendMessage(IntPtr handle, int msg, int Param, System.Text.StringBuilder text);
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetWindowRect(IntPtr handle, out RECT Rect);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
-    public class WindowInfo
-    {
-        public int ProcessId;
-        public IntPtr Handle;
-        public string ClassName;
-        public string Text;
-        public Rectangle Rect;
-
-        public WindowInfo(IntPtr Handle)
-        {
-            this.Handle = Handle;
-            this.ClassName = GetWindowClassName(Handle);
-            this.Text = GetWindowText(Handle);
-            this.Rect = GetWindowRectangle(Handle);
-            GetWindowThreadProcessId(Handle, out ProcessId);
-        }
-    }
-
-    WindowInfo LastWindow = null;
-    WindowInfo CurWindow;
-
-  
     private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
     {
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
         {
-            Point pt = Cursor.Position;
-           // this.Text = "Mouse Position: " + pt.ToString();
-            this.CurWindow = new WindowInfo(WindowFromPoint(pt));
-
-            //label1.Text = "Handle: " + this.CurWindow.Handle.ToString("X");
-            //label2.Text = "Class: " + this.CurWindow.ClassName;
-            //label3.Text = "Text: " + this.CurWindow.Text;
-            //label4.Text = "Rectangle: " + this.CurWindow.Rect.ToString();
-            //label5.Text = CurWindow.ProcessId.ToString();
-            if (this.LastWindow == null)
-            {
-                ControlPaint.DrawReversibleFrame(this.CurWindow.Rect, Color.Black, FrameStyle.Thick);
-            }
-            else if (!this.CurWindow.Handle.Equals(this.LastWindow.Handle))
-            {
-                ControlPaint.DrawReversibleFrame(this.LastWindow.Rect, Color.Black, FrameStyle.Thick);
-                ControlPaint.DrawReversibleFrame(this.CurWindow.Rect, Color.Black, FrameStyle.Thick);
-            }
-
-            this.LastWindow = this.CurWindow;
+            dm.SetCurrentWindow(new WindowInfo(Cursor.Position));
         }
     }
 
     private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
     {
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
         {
-            if (this.LastWindow != null)
-            {
-               // ControlPaint.DrawReversibleFrame(this.LastWindow.Rect, Color.Black, FrameStyle.Thick);
+            dm.BindWindow(OnBindEnd);
+        }
 
-                // ... do something with "this.LastWindow" ...
-                BindWindow();
-            }
+        void OnBindEnd((bool isOk, string processTitie) value)
+        {
+            SetButton(value.isOk, IsRunning());
+            label1.Text = $"綁定:{value.isOk} Windows:{value.processTitie}";
+        }
+    }
+    private void rebindButton_Click(object sender, EventArgs e)
+    {
+        StopFind();
+        dm.UnBindWindow(onUnBind);
+
+        void onUnBind(bool value)
+        {
+            SetButton(!value, IsRunning());
+            label1.Text = $"解除綁定:{value}";
         }
     }
 
-    public static string GetWindowClassName(IntPtr handle)
-    {
-        StringBuilder buffer = new StringBuilder(128);
-        GetClassName(handle, buffer, buffer.Capacity);
-        return buffer.ToString();
-    }
-
-    public static string GetWindowText(IntPtr handle)
-    {
-        StringBuilder buffer = new StringBuilder(SendMessage(handle, WM_GETTEXTLENGTH, 0, 0) + 1);
-        SendMessage(handle, WM_GETTEXT, buffer.Capacity, buffer);
-        return buffer.ToString();
-    }
-
-    public static Rectangle GetWindowRectangle(IntPtr handle)
-    {
-        RECT rect = new RECT();
-        GetWindowRect(handle, out rect);
-        return new Rectangle(rect.Left, rect.Top, (rect.Right - rect.Left) + 1, (rect.Bottom - rect.Top) + 1);
-    }
 
     private void Timer1_Tick(object sender, EventArgs e)
     {
@@ -1217,6 +805,19 @@ public partial class Form1 : Form
     {
 
     }
+
+    private void button1_Click(object sender, EventArgs e)
+    {
+        expeditionUnderGround[Level.普通].CheckedChanged += AAA;
+
+    }
+
+    private void AAA(object sender, EventArgs e)
+    {
+
+    }
+    #endregion
 }
+
 
 

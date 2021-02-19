@@ -9,3 +9,15 @@ C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.pdb
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\obj\Debug\Form1.resources
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\bin\Debug\dm.dll
 C:\Users\zxc30\Documents\LodAutoBot\LodAutoBot\bin\Debug\bin\Debug\dmc.dll
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\bin\Debug\bin\Debug\dm.dll
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\bin\Debug\bin\Debug\dmc.dll
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.exe.config
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.exe
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\bin\Debug\LodAutoBot.pdb
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.csprojAssemblyReference.cache
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\Form1.resources
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.Properties.Resources.resources
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.csproj.GenerateResource.cache
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.csproj.CoreCompileInputs.cache
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.exe
+C:\Users\zxc30\Documents\GitHub\LodAutoBot\LodAutoBot\obj\Debug\LodAutoBot.pdb
