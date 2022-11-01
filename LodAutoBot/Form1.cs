@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -314,7 +315,7 @@ public partial class Form1 : Form
                         dm.LeftClick();
                     }
                     Thread.Sleep(500);
-                    if (dm.FindAllPictureAndClick(clickData, ClickImage.村收))
+                    if (dm.FindAllPictureAndClick(clickData, ClickImage.村收,0.5f))
                     {
                         break;
                     }
@@ -323,7 +324,7 @@ public partial class Form1 : Form
                         Thread.Sleep(500);
                         if (!dm.FindAllPicture(clickData, ClickImage.探索報告_小) && 遠征.Checked)
                         {
-                            dm.FindAllPictureAndClick(clickData, ClickImage.遠征);
+                            dm.FindAllPictureAndClick(clickData, ClickImage.遠征,0.5f);
                         }
 
                         else if (dm.FindAllPicture(clickData, ClickImage.探索報告_小))
@@ -349,7 +350,7 @@ public partial class Form1 : Form
                     dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_藍);
                     Thread.Sleep(100);
 
-                    if (!dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_白) && !dm.FindAllPicture(clickData, ClickImage.探索完畢_藍))
+                    if (!dm.FindAllPictureAndClick(clickData, ClickImage.探索完畢_白,0.5f) && !dm.FindAllPicture(clickData, ClickImage.探索完畢_藍))
                     {
                         int[] x = new int[] { 10, -1, 0, 1, 0 };
                         int[] y = new int[] { 10, 0, -1, -0, 1 };
@@ -393,7 +394,7 @@ public partial class Form1 : Form
                             }
                             Thread.Sleep(300);
                             MouseDrop(tx, ty, 30);
-                            Thread.Sleep(300);
+                            Thread.Sleep(1500);
                         }
                     }
 
@@ -709,11 +710,11 @@ public partial class Form1 : Form
     private void StartFind()
     {
         mainThread = new Thread(MainThread);
-
+        
         if (mainThread.IsAlive)
         {
             return;
-
+        
         }
         mainThread.Start();
         SetButton(true, IsRunning());
@@ -732,7 +733,7 @@ public partial class Form1 : Form
         }
 
         mainThread.Abort();
-        SetButton(true, IsRunning());
+        SetButton(true, false);
     }
 
     private void RestWindows(Dictionary<string, ImageData> datas)

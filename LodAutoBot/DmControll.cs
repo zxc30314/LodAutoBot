@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Security.Permissions;
 using testdm;
 
 namespace LodAutoBot
@@ -26,10 +27,11 @@ namespace LodAutoBot
                 onBinded?.Invoke((false, "Error not setWindows"));
                 return;
             }
+
             process = Process.GetProcessById(CurWindow.ProcessId);
             hwnd = process.MainWindowHandle;
 
-            int result = dm.BindWindow((int)hwnd, "dx2", "windows3", "windows", 1);
+            int result = dm.BindWindow((int) hwnd, "dx2", "windows3", "windows", 1);
             onBinded?.Invoke((result == 1, process.MainWindowTitle));
         }
 
@@ -80,10 +82,11 @@ namespace LodAutoBot
                     }
                 }
             }
+
             return isFindImage;
         }
 
-        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data)
+        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data,float sim=0.7f)
         {
             bool isFindImage = false;
 
@@ -101,9 +104,11 @@ namespace LodAutoBot
                     }
                 }
             }
+
             return isFindImage;
         }
-        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, Rectangle rectangle)
+        
+        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, Rectangle rectangle,float sim=0.7f)
         {
             bool isFindImage = false;
 
@@ -122,6 +127,7 @@ namespace LodAutoBot
                     }
                 }
             }
+
             return isFindImage;
         }
 
@@ -129,9 +135,10 @@ namespace LodAutoBot
         {
             if (rectangle == default)
             {
-                dm.GetClientSize((int)hwnd, out Size size);
+                dm.GetClientSize((int) hwnd, out Size size);
                 rectangle = new Rectangle(new Point(0, 0), size);
             }
+
             rectangle.Size += new Size(5, 5);
             bool result = dm.FindPic(rectangle, picturePath, "000000", sim, 0, out Point tempPoint);
 
@@ -147,6 +154,7 @@ namespace LodAutoBot
                 dm.MoveTo(point);
                 dm.LeftClick();
             }
+
             return isFind;
         }
 
@@ -165,9 +173,4 @@ namespace LodAutoBot
             dm.LeftUp();
         }
     }
-
-
-
-
-
 }
