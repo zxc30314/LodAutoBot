@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Form1;
+using static LodAutoBot.Form1;
 
 namespace LodAutoBot
 {

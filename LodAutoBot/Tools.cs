@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using static Form1;
+using static LodAutoBot.Form1;
 
 namespace LodAutoBot
 {

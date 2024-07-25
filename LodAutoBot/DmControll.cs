@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Security.Permissions;
+using System.Threading.Tasks;
 using testdm;
 
 namespace LodAutoBot
 {
-    internal class DmControll
+    public class DmControll
     {
         private WindowInfo CurWindow;
         private readonly CDmSoft dm = new CDmSoft();
@@ -20,7 +21,12 @@ namespace LodAutoBot
             CurWindow = windowinfo;
         }
 
-        public void BindWindow(Action<(bool isOk, string processTitie)> onBinded)
+        public int Capture()
+        {
+            return dm.Capture(0, 0, CurWindow.Rectangle.Size.Width, CurWindow.Rectangle.Size.Height + 30, "test.bmp");
+        }
+
+        public void BindWindow(Action<(bool success, string processTitie)> onBinded)
         {
             if (CurWindow == null)
             {
@@ -31,7 +37,7 @@ namespace LodAutoBot
             process = Process.GetProcessById(CurWindow.ProcessId);
             hwnd = process.MainWindowHandle;
 
-            int result = dm.BindWindow((int) hwnd, "dx2", "windows3", "windows", 1);
+            int result = dm.BindWindow((int)hwnd, "dx2", "windows3", "windows", 1);
             onBinded?.Invoke((result == 1, process.MainWindowTitle));
         }
 
@@ -43,30 +49,18 @@ namespace LodAutoBot
             onUnBinded?.Invoke(result == 1);
         }
 
-        public void MoveTo(int x, int y)
-        {
-            dm.MoveTo(x, y);
-        }
-
-        public void LeftClick()
-        {
-            dm.LeftClick();
-        }
 
         public (bool b, ImageData image) FindImageData(Dictionary<string, ImageData> datas, Enum type)
         {
-
             if (datas.ContainsKey(type.ToString()))
             {
-
                 return (true, datas[type.ToString()]);
             }
 
             return (false, null);
-
         }
 
-        public bool FindAllPicture(Dictionary<string, ImageData> imageDatas, Enum data)
+        public bool FindAllPicture(Dictionary<string, ImageData> imageDatas, Enum data, double sim = sim)
         {
             bool isFindImage = false;
             if (imageDatas.ContainsKey(data.ToString()))
@@ -74,11 +68,9 @@ namespace LodAutoBot
                 ImageData imageData = imageDatas[data.ToString()];
                 for (int j = 0; j < imageData.Paths.Length; j++)
                 {
-
                     if (FindPicture(imageData.Paths[j], sim, imageData.Rectangle[j]).isFind)
                     {
                         isFindImage = true;
-
                     }
                 }
             }
@@ -86,7 +78,7 @@ namespace LodAutoBot
             return isFindImage;
         }
 
-        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data,float sim=0.7f)
+        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, float sim = 0.7f)
         {
             bool isFindImage = false;
 
@@ -100,15 +92,14 @@ namespace LodAutoBot
                     {
                         isFindImage = true;
                         break;
-
                     }
                 }
             }
 
             return isFindImage;
         }
-        
-        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, Rectangle rectangle,float sim=0.7f)
+
+        public bool FindAllPictureAndClick(Dictionary<string, ImageData> imageDatas, Enum data, Rectangle rectangle, float sim = 0.7f)
         {
             bool isFindImage = false;
 
@@ -118,12 +109,10 @@ namespace LodAutoBot
 
                 for (int j = 0; j < imageDatas[data.ToString()].Paths.Length; j++)
                 {
-
                     if (FindPictureAndClick(imageData.Paths[j], sim, rectangle))
                     {
                         isFindImage = true;
                         break;
-
                     }
                 }
             }
@@ -135,11 +124,13 @@ namespace LodAutoBot
         {
             if (rectangle == default)
             {
-                dm.GetClientSize((int) hwnd, out Size size);
+                dm.GetClientSize((int)hwnd, out Size size);
                 rectangle = new Rectangle(new Point(0, 0), size);
             }
 
-            rectangle.Size += new Size(5, 5);
+            rectangle.X -= 30;
+            rectangle.Y -= 30;
+            rectangle.Size += new Size(60, 60);
             bool result = dm.FindPic(rectangle, picturePath, "000000", sim, 0, out Point tempPoint);
 
             return (result, tempPoint);
@@ -171,6 +162,16 @@ namespace LodAutoBot
         public void LeftUp()
         {
             dm.LeftUp();
+        }
+
+        public void MoveTo(int x, int y)
+        {
+            dm.MoveTo(x, y);
+        }
+
+        public void LeftClick()
+        {
+            dm.LeftClick();
         }
     }
 }
